@@ -49,6 +49,11 @@ Cesium Solutions general information can be found [here](http://www.cesiumsoluti
       - ```CFRAME_SUBDIRS_HEADERS_PRIVATE```
       - ```CFRAME_SUBDIRS_SOURCES```
 
+* Automate and standardize (unit) testing configuration
+  - Catch
+  - GoogleTest
+  - Boost.unit_test
+
 * Handling of external packages
   - Define a ```CFRAME_EXTERNALS_POLICY``` which can take one of the following:
     - Manual: all externals must be specified explicitly, maybe using
