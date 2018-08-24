@@ -6,6 +6,7 @@ set( CMAKE_MODULE_PATH
 )
 
 include( CFrameInitialize )
+add_subdirectory( testtools )
 
 cframe_main()
 

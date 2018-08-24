@@ -39,6 +39,8 @@ if ( WIN32 )
   endforeach()
 endif()
 
+include_directories( testtools )
+
 include( CFrameInternal )
 include( CFrameUtilities )
 include( CFrameExternalPackages )
