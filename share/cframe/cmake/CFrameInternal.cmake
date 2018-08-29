@@ -5,13 +5,13 @@
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
-# Macro: cframe_prepare_projects
+# Macro: cframe_prepare_products
 #
-# Do a first pass through all project directories
+# Do a first pass through all product directories
 # and include their CFrameLists.txt file (if it exists).
 #
-# The Package's CFrameLists.txt should do the following:
-# - specify include_directoriem s for the appropriate project subdirectories
+# The Product's CFrameLists.txt should do the following:
+# - specify include_directoriem s for the appropriate product subdirectories
 # - specify the name of external package dependencies, and when possible
 #   the components of those packages. This can be done using the function:
 #
@@ -34,7 +34,7 @@
 #   other dependent Projects can refer to then in a standard way. This done by
 #   using the function:
 #
-#       cframe_publish_project( PRODUCT_NAME
+#       cframe_publish_product( PRODUCT_NAME
 #           VERSION      <parts of version identifier: major minor patch build, number of elements is optional>
 #           DEFINITIONS  <list of definitions>
 #           INCLUDE_DIRS <list of directories to include>
@@ -46,9 +46,9 @@
 #     CFRAME_PRODUCTS_DIR
 #
 # -----------------------------------------------------------------------------
-macro( cframe_prepare_projects )
+macro( cframe_prepare_products )
 
-  cframe_message( STATUS 3 "CFrame: MACRO: cframe_internal_project_prepare" )
+  cframe_message( STATUS 3 "CFrame: MACRO: cframe_prepare_products" )
 
   # Assume all directories under the products directory are products. Make a BUILD option
   # for each of them.
@@ -57,6 +57,7 @@ macro( cframe_prepare_projects )
       RELATIVE ${CFRAME_PRODUCTS_DIR}
       ${CFRAME_PRODUCTS_DIR}/*
   )
+  cframe_message( STATUS 4 "CFrame: Product directories: ${PRODUCT_DIRS}")
   foreach( PRODUCT ${PRODUCT_DIRS} )
     if ( (IS_DIRECTORY ${CFRAME_PRODUCTS_DIR}/${PRODUCT}) AND
          (EXISTS ${CFRAME_PRODUCTS_DIR}/${PRODUCT}/CMakeLists.txt) )
@@ -108,9 +109,9 @@ macro( cframe_prepare_projects )
       )
 
     endif() # is directory and CMakeLists.txt exists
-  endforeach() # project subdirectory loop
+  endforeach() # product subdirectory loop
 
-endmacro() # cframe_prepare_projects
+endmacro() # cframe_prepare_products
 
 # -----------------------------------------------------------------------------
 # Macro: cframe_setup_external_packages
@@ -128,9 +129,9 @@ macro( cframe_setup_external_packages )
         "CFrame: Setting up external package: ${XPACKAGE} with components: ${CFRAME_EXTERNAL_${XPACKAGE}_COMPONENTS}"
     )
 
-    if ( EXISTS ${${PRODUCT_NAME}_SOURCE_DIR}/share/${PRODUCT_NAME}/cmake/Setup${XPACKAGE}.cmake )
-      cframe_message( STATUS 3 "CFrame: Using share/${PRODUCT_NAME}/cmake/Setup${XPACKAGE}.cmake" )
-      include( ${${PRODUCT_NAME}_SOURCE_DIR}/share/${PRODUCT_NAME}/cmake/Setup${XPACKAGE}.cmake )
+    if ( EXISTS ${${PROJECT_NAME}_SOURCE_DIR}/share/${PROJECT_NAME}/cmake/Setup${XPACKAGE}.cmake )
+      cframe_message( STATUS 3 "CFrame: Using share/${PROJECT_NAME}/cmake/Setup${XPACKAGE}.cmake" )
+      include( ${${PROJECT_NAME}_SOURCE_DIR}/share/${PROJECT_NAME}/cmake/Setup${XPACKAGE}.cmake )
     else()
       cframe_message( STATUS 3 "CFrame: Using standard external setup for package: ${XPACKAGE}" )
       cframe_setup_external_package( ${XPACKAGE} "${CFRAME_EXTERNAL_${XPACKAGE}_COMPONENTS}" )
@@ -140,13 +141,13 @@ macro( cframe_setup_external_packages )
 endmacro() # cframe_setup_external_packages
 
 # -----------------------------------------------------------------------------
-# Macro: cframe_build_projects
+# Macro: cframe_build_products
 #
-# Now go through each of the project directories again and add their
+# Now go through each of the product directories again and add their
 # subdirectories. The CFRAME_BUILD variable will be set to true so that each
-# project can either build using CFrame conventions or their own conventions.
+# product can either build using CFrame conventions or their own conventions.
 #
-# For example, in the root CMakeLists.txt of the project, the following check
+# For example, in the root CMakeLists.txt of the product, the following check
 # can be made:
 #
 #   if ( ${CFRAME_BUILD} )
@@ -156,13 +157,14 @@ endmacro() # cframe_setup_external_packages
 #   endif()
 #
 # -----------------------------------------------------------------------------
-macro( cframe_build_projects )
+macro( cframe_build_products )
 
-  cframe_message( STATUS 3 "CFrame: MACRO: cframe_internal_project_build" )
+  cframe_message( STATUS 3 "CFrame: MACRO: cframe_build_products" )
+  cframe_message( STATUS 4 "CFrame: Products: ${CFRAME_BUILD_PRODUCTS}")
 
   set( CFRAME_BUILD TRUE )
-  foreach( PRODUCT ${CFRAME_BUILD_PRODUCT} )
-    if ( ${BUILD_PRODUCT_${PRODUCT}} )
+  foreach( PRODUCT ${CFRAME_BUILD_PRODUCTS} )
+    if ( BUILD_PRODUCT_${PRODUCT} MATCHES ON )
       # @todo Find a better way to determine if CMAKE_PRODUCTS_DIR is outside
       # of CFrame's source directory
       if ( IS_ABSOLUTE ${CFRAME_PRODUCTS_DIR} )
@@ -172,8 +174,9 @@ macro( cframe_build_projects )
       endif()
     endif()
   endforeach()
+  set( CFRAME_BUILD FALSE )
 
-endmacro() # cframe_build_projects
+endmacro() # cframe_build_products
 
 # -----------------------------------------------------------------------------
 # Macro: cframe_main
@@ -184,10 +187,10 @@ macro( cframe_main )
 
   cframe_message( STATUS 3 "CFrame: MACRO: cframe_main" )
 
-  cframe_prepare_projects()
+  cframe_prepare_products()
 
   cframe_setup_external_packages()
 
-  cframe_build_projects()
+  cframe_build_products()
 
 endmacro() # cframe_prepare
