@@ -2,9 +2,10 @@
 # Application for console-based hello library
 # -------------------------------------------
 cframe_build_target(
-    BASENAME hello
-    TYPE     Executable
-    GROUP    CFrameDemo
+    TARGET_NAME   cframeHello
+    PROJECT_LABEL hello
+    TYPE          Executable
+    GROUP         CFrameDemo/Tests
     INCLUDE_DIRS
         ../libs
     SOURCES
@@ -17,15 +18,16 @@ cframe_build_target(
 # Application for qt-based hello library
 # --------------------------------------
 cframe_build_target(
-    BASENAME qHello
-    TYPE     Executable
-    GROUP    CFrameDemo
+    TARGET_NAME   cframeQHello
+    PROJECT_LABEL QHello
+    TYPE          Executable
+    GROUP         CFrameDemo/Tests
     INCLUDE_DIRS
         ../libs
     SOURCES
         qHello.cpp
     LIBRARIES
-        QtCFrameDemo
+        CFrameQtDemo
         ${QT_LIBRARIES}
 )
 
@@ -33,14 +35,15 @@ cframe_build_target(
 # Library for osg-based hello library
 # -----------------------------------
 cframe_build_target(
-    BASENAME osgHello
-    TYPE     Executable
-    GROUP    CFrameDemo
+    TARGET_NAME   cframeOSGHello
+    PROJECT_LABEL OSGHello
+    TYPE          Executable
+    GROUP         CFrameDemo/Tests
     INCLUDE_DIRS
         ../libs
     SOURCES
         osgHello.cpp
     LIBRARIES
-        osgCFrameDemo
+        CFrameOSGDemo
         ${OPENSCENEGRAPH_LIBRARIES}
 )

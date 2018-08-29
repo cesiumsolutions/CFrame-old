@@ -2,9 +2,10 @@
 # Library for console-based demo library
 # --------------------------------------
 cframe_build_target(
-    BASENAME cframedemo
-    TYPE     Library
-    GROUP    CFrameDemo
+    TARGET_NAME   cframedemo
+    PROJECT_LABEL CDemo
+    TYPE          Library
+    GROUP         CFrameDemo/Libraries
     INCLUDE_DIRS
         ..
     HEADERS_PUBLIC
@@ -12,7 +13,7 @@ cframe_build_target(
         hello.h
     SOURCES
         hello.c
-    HEADER_INSTALL_DIR
+    HEADERS_INSTALL_DIR
         include/CFrameDemo
 `)
 
@@ -20,9 +21,10 @@ cframe_build_target(
 # Library for osg-based demo library
 # ----------------------------------
 cframe_build_target(
-    BASENAME osgCFrameDemo
-    TYPE     Library
-    GROUP    CFrameDemo
+    TARGET_NAME   CFrameOSGDemo
+    PROJECT_LABEL OSGDemo
+    TYPE          Library
+    GROUP         CFrameDemo/Libraries
     INCLUDE_DIRS
         ..
     HEADERS_PUBLIC
@@ -32,7 +34,7 @@ cframe_build_target(
         osgHello.cpp
     LIBRARIES
         ${OPENSCENEGRAPH_LIBRARIES}
-    HEADER_INSTALL_DIR
+    HEADERS_INSTALL_DIR
         include/CFrameDemo
 )
 
@@ -40,9 +42,10 @@ cframe_build_target(
 # Library for qt-based demo library
 # ---------------------------------
 cframe_build_target(
-    BASENAME QtCFrameDemo
-    TYPE     Library
-    GROUP    CFrameDemo
+    TARGET_NAME   CFrameQtDemo
+    PROJECT_LABEL QtDemo
+    TYPE          Library
+    GROUP         CFrameDemo/Libraries
     INCLUDE_DIRS
         ..
     HEADERS_PUBLIC
@@ -54,7 +57,7 @@ cframe_build_target(
         QHello.hpp
     LIBRARIES
         ${QT_LIBRARIES}
-    HEADER_INSTALL_DIR
+    HEADERS_INSTALL_DIR
         include/CFrameDemo
 )
 
@@ -64,7 +67,7 @@ cframe_build_target(
 # Note: Modern CMake has new automated ways of handling this. 
 
 set_target_properties(
-    cframedemo osgCFrameDemo QtCFrameDemo
+    cframedemo CFrameOSGDemo CFrameQtDemo
     PROPERTIES
         DEFINE_SYMBOL cframedemo_EXPORTS
 )
