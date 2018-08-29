@@ -9,12 +9,12 @@ cframe_message( STATUS 3 "Current Project Name: ${CFRAME_CURRENT_PROJECT_NAME}" 
 # -------------------------------------------------------------------
 # Publish standard CMake variables that may be used by other projects
 # -------------------------------------------------------------------
-cframe_publish_project(
-    PROJECT ${CFRAME_CURRENT_PROJECT_NAME}
+cframe_publish_product(
+    PRODUCT ${CFRAME_CURRENT_PRODUCT_NAME}
     VERSION 0 1 0 0 Beta
     DEFINITIONS
     INCLUDE_DIRS
-        ${CFRAME_CURRENT_PROJECT_DIR}/libs/
+        ${CFRAME_CURRENT_PRODUCT_DIR}/libs/
     LIBRARY_DIRS
     LIBRARIES
         cframehello
