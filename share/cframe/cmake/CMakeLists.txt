@@ -1,8 +1,9 @@
 # cframe scripts target
 
 cframe_build_custom_target(
-    NAME    ${PROJECT_NAME}_scripts
-    GROUP   CFrame
+    TARGET_NAME   ${PROJECT_NAME}_scripts
+    PROJECT_LABEL Scripts
+    GROUP         CFrameSources
     FILES_PUBLIC
         CFrameBuildFunctions.cmake
         CFrameExternalPackages.cmake

@@ -4,6 +4,9 @@
 #
 # -----------------------------------------------------------------------------
 
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
 function( cframe_publish_project )
 
   cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_publish_project")
@@ -103,3 +106,126 @@ function( cframe_publish_project )
   endif()
 
 endfunction() # cframe_publish_project
+
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
+macro( cframe_setup_subdir )
+
+  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_setup_subdir")
+
+  # -----------------------------------
+  # Set up and parse multiple arguments
+  # -----------------------------------
+  set( options
+  )
+  set( oneValueArgs
+      PREFIX
+      SUBDIR
+      FOLDER
+      HEADERS_INSTALL_DIR
+      FILES_INSTALL_DIR
+  )
+  set( multiValueArgs
+      HEADERS_PUBLIC
+      HEADERS_PRIVATE
+      FILES_PUBLIC
+      FILES_PRIVATE
+      SOURCES
+  )
+
+  cmake_parse_arguments(
+      cframe_setup_subdir
+      "${options}"
+      "${oneValueArgs}"
+      "${multiValueArgs}"
+      ${ARGN}
+  )
+
+  cframe_message( STATUS 4 "Parameters for cframe_setup_subdir:" )
+  cframe_message( STATUS 4 "PREFIX:               ${cframe_setup_subdir_PREFIX}" )
+  cframe_message( STATUS 4 "SUBDIR:               ${cframe_setup_subdir_SUBDIR}" )
+  cframe_message( STATUS 4 "FOLDER:               ${cframe_setup_subdir_FOLDER}" )
+  cframe_message( STATUS 4 "HEADERS_INSTALL_DIR:  ${cframe_setup_subdir_HEADERS_INSTALL_DIR}" )
+  cframe_message( STATUS 4 "FILES_INSTALL_DIR:    ${cframe_setup_subdir_FILESS_INSTALL_DIR}" )
+  cframe_message( STATUS 4 "HEADERS_PUBLIC:       ${cframe_setup_subdir_HEADERS_PUBLIC}" )
+  cframe_message( STATUS 4 "HEADERS_PRIVATE:      ${cframe_setup_subdir_HEADERS_PRIVATE}" )
+  cframe_message( STATUS 4 "FILES_PUBLIC:         ${cframe_setup_subdir_FILES_PUBLIC}" )
+  cframe_message( STATUS 4 "FILES_PRIVATE:        ${cframe_setup_subdir_FILES_PRIVATE}" )
+  cframe_message( STATUS 4 "SOURCES:              ${cframe_setup_subdir_SOURCES}" )
+
+  set( PREFIX               ${cframe_setup_subdir_PREFIX} )
+  set( SUBDIR               ${cframe_setup_subdir_SUBDIR} )
+  set( FOLDER               ${cframe_setup_subdir_FOLDER} )
+  set( HEADERS_INSTALL_DIR  ${cframe_setup_subdir_HEADERS_INSTALL_DIR} )
+  set( FILES_INSTALL_DIR    ${cframe_setup_subdir_FILESS_INSTALL_DIR} )
+  set( HEADERS_PUBLIC       ${cframe_setup_subdir_HEADERS_PUBLIC} )
+  set( HEADERS_PRIVATE      ${cframe_setup_subdir_HEADERS_PRIVATE} )
+  set( FILES_PUBLIC         ${cframe_setup_subdir_FILES_PUBLIC} )
+  set( FILES_PRIVATE        ${cframe_setup_subdir_FILES_PRIVATE} )
+  set( SOURCES              ${cframe_setup_subdir_SOURCES} )
+
+  # Allow the case for a SUBDIR which is actually the current directory, in which case
+  # SUBDIR should be undefined and the SEP will also remain undefined below
+  if ( NOT ${SUBDIR} STREQUAL "" )
+    set( SEP "/" )
+  endif()
+
+  foreach( FILE ${HEADERS_PUBLIC} )
+    list( APPEND ${PREFIX}_HEADERS_PUBLIC ${SUBDIR}${SEP}${FILE} )
+  endforeach()
+  set( ${PREFIX}_HEADERS_PUBLIC ${${PREFIX}_HEADERS_PUBLIC} PARENT_SCOPE )
+  cframe_message( STATUS 4 "CFrame: ${PREFIX}_HEADERS_PUBLIC: ${${PREFIX}_HEADERS_PUBLIC}" )
+
+  foreach( FILE ${HEADERS_PRIVATE} )
+    list( APPEND ${PREFIX}_HEADERS_PRIVATE ${SUBDIR}${SEP}${FILE} )
+  endforeach()
+  set( ${PREFIX}_HEADERS_PRIVATE ${${PREFIX}_HEADERS_PRIVATE} PARENT_SCOPE )
+  cframe_message( STATUS 4 "CFrame: ${PREFIX}_HEADERS_PRIVATE: ${${PREFIX}_HEADERS_PRIVATE}" )
+
+  foreach( FILE ${FILES_PUBLIC} )
+    list( APPEND ${PREFIX}_FILES_PUBLIC ${SUBDIR}${SEP}${FILE} )
+  endforeach()
+  set( ${PREFIX}_FILES_PUBLIC ${${PREFIX}_FILES_PUBLIC} PARENT_SCOPE )
+  cframe_message( STATUS 4 "CFrame: ${PREFIX}_FILES_PUBLIC: ${${PREFIX}_FILES_PUBLIC}" )
+
+  foreach( FILE ${FILES_PRIVATE} )
+    list( APPEND ${PREFIX}_FILES_PRIVATE ${SUBDIR}${SEP}${FILE} )
+  endforeach()
+  set( ${PREFIX}_FILES_PRIVATE ${${PREFIX}_FILES_PRIVATE} PARENT_SCOPE )
+  cframe_message( STATUS 4 "CFrame: ${PREFIX}_FILES_PRIVATE: ${${PREFIX}_FILES_PRIVATE}" )
+
+  foreach( FILE ${SOURCES} )
+    list( APPEND ${PREFIX}_SOURCES ${SUBDIR}${SEP}${FILE} )
+  endforeach()
+  set( ${PREFIX}_SOURCES ${${PREFIX}_FILES_SOURCES} PARENT_SCOPE )
+  cframe_message( STATUS 4 "CFrame: ${PREFIX}_SOURCES: ${${PREFIX}_SOURCES}" )
+
+  source_group(
+      \\${FOLDER} FILES
+      ${${PREFIX}_HEADERS_PUBLIC}
+      ${${PREFIX}_HEADERS_PRIVATE}
+      ${${PREFIX}_FILES_PUBLIC}
+      ${${PREFIX}_FILES_PRIVATE}
+      ${${PREFIX}_SOURCES}
+  )
+
+  if ( DEFINED cframe_setup_subdir_HEADERS_INSTALL_DIR )
+    install(
+        FILES
+            ${${PREFIX}_HEADERS_PUBLIC}
+        DESTINATION
+            ${cframe_setup_subdir_HEADERS_INSTALL_DIR}
+    )
+  endif()
+
+  if (DEFINED cframe_setup_subdir_FILES_INSTALL_DIR )
+    install(
+        FILES
+            ${${PREFIX}_FILES_PUBLIC}
+        DESTINATION
+            ${cframe_setup_subdir_FILES_INSTALL_DIR}
+    )
+  endif()
+
+endmacro() # cframe_setup_subdir
