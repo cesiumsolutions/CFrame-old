@@ -8,8 +8,8 @@
 # Needed for the named parameter arguments
 include( CMakeParseArguments )
 
-set( CFRAME_PROJECTS_DIR ${${PROJECT_NAME}_SOURCE_DIR}/projects
-    CACHE PATH "Parent directory for all projects to be compiled."
+set( CFRAME_PRODUCTS_DIR ${${PRODUCT_NAME}_SOURCE_DIR}/products
+    CACHE PATH "Parent directory for all products to be compiled."
 )
 option( CFRAME_FLAT_SOURCE_TREE "Determines whether project subfolders are automatically created in IDES" ON )
 set( CFRAME_INSTALL_BIN_DIR bin

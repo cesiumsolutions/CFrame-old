@@ -107,12 +107,41 @@ function( cframe_build_target )
   cframe_message( STATUS 4 "NO_INSTALL:         ${cframe_build_target_NO_INSTALL}" )
   cframe_message( STATUS 4 "HEADERS_INSTALL_DIR: ${cframe_build_target_HEADERS_INSTALL_DIR}" )
 
-  # Check that minimal values are defined and valid
+  # ------------------------------------
+  # Preliminary Build checks and filters
+  # ------------------------------------
+  # Apply rough build filters: BUILD_${cframe_build_target_TARGET_NAME} takes precedence if it is defined.
+  # Otherwise use the value of BUILD_${cframe_build_target_GROUP}
+  # If neither exist, the default is to build the target
+  # Note: Don't add the option for BUILD_${cframe_build_target_TARGET_NAME}, otherwise it will always
+  # be defined and you'd have to turn all the targets off manually if you want to turn off a whole group
+
+  # Apply filtering toggles at the Project level
   if ( NOT DEFINED cframe_build_target_TARGET_NAME )
-    frame_message( WARNING 1 "CFrame: cframe_build_target no TARGET_NAME parameter specified" )
+    cframe_message( WARNING 1 "CFrame: cframe_build_target no TARGET_NAME parameter specified" )
     return()
+  else()
+    option( BUILD_PROJECT_${cframe_build_target_TARGET_NAME} "Set ON to build project ${cframe_build_target_TARGET_NAME}." ON )
+    if ( BUILD_PROJECT_${cframe_build_target_TARGET_NAME} MATCHES OFF )
+      cframe_message( STATUS 3 "CFrame: Skipping project: ${cframe_build_target_TARGET_NAME}" )
+      return()
+    else()
+      cframe_message( STATUS 4 "CFrame: Building project: ${cframe_build_target_TARGET_NAME}" )
+    endif()
   endif()
 
+  # Apply filtering toggles at the Group level
+  if ( DEFINED cframe_build_target_GROUP )
+    option( BUILD_GROUP_${cframe_build_target_GROUP} "Set ON to build group ${cframe_build_target_GROUP}." ON )
+    if ( BUILD_GROUP_${cframe_build_target_GROUP} MATCHES OFF )
+      cframe_message( STATUS 3 "CFrame: Skipping group: ${cframe_build_target_GROUP}" )
+      return()
+    else()
+      cframe_message( STATUS 4 "CFrame: Building group: ${cframe_build_target_GROUP}" )
+    endif()
+  endif()
+
+  # Check for valid Type
   if ( NOT DEFINED cframe_build_target_TYPE )
     cframe_message( WARNING 1 "CFrame: cframe_build_target no TYPE parameter specified" )
     return()
@@ -127,45 +156,26 @@ function( cframe_build_target )
   endif()
 
   # Make some shorter more convenient names
-  set( _TARGET_NAME         ${cframe_build_target_TARGET_NAME} )
-  set( _OUTPUT_NAME         ${cframe_build_target_OUTPUT_NAME} )
-  set( _PROJECT_LABEL       ${cframe_build_target_PROJECT_LABEL} )
-  set( _TYPE                ${cframe_build_target_TYPE} )
-  set( _LINK_TYPE           ${cframe_build_target_LINK_TYPE} )
-  set( _GROUP               ${cframe_build_target_GROUP} )
-  set( _INCLUDE_DIRS        ${cframe_build_target_INCLUDE_DIRS} )
-  set( _DEFINES             ${cframe_build_target_DEFINES} )
-  set( _COMPILE_FLAGS       ${cframe_build_target_COMPILE_FLAGS} )
-  set( _LINK_FLAGS          ${cframe_build_target_LINK_FLAGS} )
-  set( _LIBRARY_DIRS        ${cframe_build_target_LIBRARY_DIRS} )
-  set( _LIBRARIES           ${cframe_build_target_LIBRARIES} )
-  set( _HEADERS_PUBLIC      ${cframe_build_target_HEADERS_PUBLIC} )
-  set( _HEADERS_PRIVATE     ${cframe_build_target_HEADERS_PRIVATE} )
-  set( _SOURCES             ${cframe_build_target_SOURCES} )
-  set( _QT_MOCFILES         ${cframe_build_target_QT_MOCFILES} )
-  set( _QT_UIFILES          ${cframe_build_target_QT_UIFILES} )
-  set( _QT_QRCFILES         ${cframe_build_target_QT_QRCFILES} )
-  set( _NO_INSTALL          ${cframe_build_target_NO_INSTALL} )
+  set( _TARGET_NAME          ${cframe_build_target_TARGET_NAME} )
+  set( _OUTPUT_NAME          ${cframe_build_target_OUTPUT_NAME} )
+  set( _PROJECT_LABEL        ${cframe_build_target_PROJECT_LABEL} )
+  set( _TYPE                 ${cframe_build_target_TYPE} )
+  set( _LINK_TYPE            ${cframe_build_target_LINK_TYPE} )
+  set( _GROUP                ${cframe_build_target_GROUP} )
+  set( _INCLUDE_DIRS         ${cframe_build_target_INCLUDE_DIRS} )
+  set( _DEFINES              ${cframe_build_target_DEFINES} )
+  set( _COMPILE_FLAGS        ${cframe_build_target_COMPILE_FLAGS} )
+  set( _LINK_FLAGS           ${cframe_build_target_LINK_FLAGS} )
+  set( _LIBRARY_DIRS         ${cframe_build_target_LIBRARY_DIRS} )
+  set( _LIBRARIES            ${cframe_build_target_LIBRARIES} )
+  set( _HEADERS_PUBLIC       ${cframe_build_target_HEADERS_PUBLIC} )
+  set( _HEADERS_PRIVATE      ${cframe_build_target_HEADERS_PRIVATE} )
+  set( _SOURCES              ${cframe_build_target_SOURCES} )
+  set( _QT_MOCFILES          ${cframe_build_target_QT_MOCFILES} )
+  set( _QT_UIFILES           ${cframe_build_target_QT_UIFILES} )
+  set( _QT_QRCFILES          ${cframe_build_target_QT_QRCFILES} )
+  set( _NO_INSTALL           ${cframe_build_target_NO_INSTALL} )
   set( _HEADERS_INSTALL_DIR  ${cframe_build_target_HEADERS_INSTALL_DIR} )
-
-  # ------------------------------------
-  # Preliminary Build checks and filters
-  # ------------------------------------
-  # Apply rough build filters: BUILD_${cframe_build_target_TARGET_NAME} takes precedence if it is defined.
-  # Otherwise use the value of BUILD_${cframe_build_target_GROUP}
-  # If neither exist, the default is to build the target
-  # Note: Don't add the option for BUILD_${cframe_build_target_TARGET_NAME}, otherwise it will always
-  # be defined and you'd have to turn all the targets off manually if you want to turn off a whole group
-  ##  option( BUILD_${cframe_build_target_TARGET_NAME} "Set ON to build this target." ON )
-  option( BUILD_${_GROUP} "Set ON to build group ${_GROUP}." ON )
-
-  if ( DEFINED BUILD_${_TARGET_NAME} )
-    if ( NOT BUILD_${_TARGET_NAME} )
-      return()
-    endif()
-  elseif ( NOT BUILD_${_GROUP} )
-    return()
-  endif()
 
   # Apply fine-grained build filters on a per file level using the IGS_FILE_EXCLUDE_LIST
 ##  cframe_filter_list( _HEADERS_PUBLIC  CFRAME_FILE_EXCLUDE_LIST )
@@ -485,11 +495,31 @@ function( cframe_build_custom_target )
   cframe_message( STATUS 4 "INSTALL_DIR:    ${cframe_build_custom_target_INSTALL_DIR}" )
   cframe_message( STATUS 4 "DEBUG:          ${cframe_build_custom_target_DEBUG}" )
 
+  # Apply filtering toggles at the Project level
   if ( NOT DEFINED cframe_build_custom_target_TARGET_NAME )
      cframe_message( WARNING 1
          "CFrame: No NAME parameter specified"
      )
     return()
+  else()
+    option( BUILD_PROJECT_${cframe_build_custom_target_TARGET_NAME} "Set ON to build project ${cframe_build_custom_target_TARGET_NAME}." ON )
+    if ( BUILD_PROJECT_${cframe_build_custom_target_TARGET_NAME} MATCHES OFF )
+      cframe_message( STATUS 3 "CFrame: Skipping project: ${cframe_build_custom_target_TARGET_NAME}" )
+      return()
+    else()
+      cframe_message( STATUS 4 "CFrame: Building project: ${cframe_build_custom_target_TARGET_NAME}" )
+    endif()
+  endif()
+
+  # Apply filtering toggles at the Group level
+  if ( DEFINED cframe_build_custom_target_GROUP )
+    option( BUILD_GROUP_${cframe_build_custom_target_GROUP} "Set ON to build group ${cframe_build_custom_target_GROUP}." ON )
+    if ( BUILD_GROUP_${cframe_build_custom_target_GROUP} MATCHES OFF )
+      cframe_message( STATUS 3 "CFrame: Skipping group: ${cframe_build_custom_target_GROUP}" )
+      return()
+    else()
+      cframe_message( STATUS 4 "CFrame: Building group: ${cframe_build_custom_target_GROUP}" )
+    endif()
   endif()
 
   add_custom_target(

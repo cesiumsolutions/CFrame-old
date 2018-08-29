@@ -7,9 +7,9 @@
 # -----------------------------------------------------------------------------
 #
 # -----------------------------------------------------------------------------
-function( cframe_publish_project )
+function( cframe_publish_product )
 
-  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_publish_project")
+  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_publish_product")
 
   # -----------------------------------
   # Set up and parse multiple arguments
@@ -17,7 +17,7 @@ function( cframe_publish_project )
   set( options
   )
   set( oneValueArgs
-      PROJECT
+      PRODUCT
   )
   set( multiValueArgs
       VERSION
@@ -28,84 +28,84 @@ function( cframe_publish_project )
   )
 
   cmake_parse_arguments(
-      cframe_publish_project
+      cframe_publish_product
       "${options}"
       "${oneValueArgs}"
       "${multiValueArgs}"
       ${ARGN}
   )
 
-  cframe_message( STATUS 4 "Parameters for cframe_publish_project:" )
-  cframe_message( STATUS 4 "PROJECT:       ${cframe_publish_project_PROJECT}" )
-  cframe_message( STATUS 4 "VERSION:       ${cframe_publish_project_VERSION}" )
-  cframe_message( STATUS 4 "DEFINITIONS:   ${cframe_publish_project_DEFINITIONS}" )
-  cframe_message( STATUS 4 "INCLUDE_DIRS:  ${cframe_publish_project_INCLUDE_DIRS}" )
-  cframe_message( STATUS 4 "LIBRARY_DIRS:  ${cframe_publish_project_LIBRARY_DIRS}" )
-  cframe_message( STATUS 4 "LIBRARIES:     ${cframe_publish_project_LIBRARIES}" )
+  cframe_message( STATUS 4 "Parameters for cframe_publish_product:" )
+  cframe_message( STATUS 4 "PRODUCT:       ${cframe_publish_product_PRODUCT}" )
+  cframe_message( STATUS 4 "VERSION:       ${cframe_publish_product_VERSION}" )
+  cframe_message( STATUS 4 "DEFINITIONS:   ${cframe_publish_product_DEFINITIONS}" )
+  cframe_message( STATUS 4 "INCLUDE_DIRS:  ${cframe_publish_product_INCLUDE_DIRS}" )
+  cframe_message( STATUS 4 "LIBRARY_DIRS:  ${cframe_publish_product_LIBRARY_DIRS}" )
+  cframe_message( STATUS 4 "LIBRARIES:     ${cframe_publish_product_LIBRARIES}" )
 
   # Check that minimal values are defined and valid
-  if ( NOT DEFINED cframe_publish_project_PROJECT )
-    cframe_message( WARNING 1 "CFrame: cframe_publish_project no PROJECT parameter specified" )
+  if ( NOT DEFINED cframe_publish_product_PRODUCT )
+    cframe_message( WARNING 1 "CFrame: cframe_publish_product no PRODUCT parameter specified" )
     return()
   endif()
 
-  string( TOUPPER ${cframe_publish_project_PROJECT} UPROJECT )
+  string( TOUPPER ${cframe_publish_product_PRODUCT} UPRODUCT )
 
-  cframe_message( STATUS 3 "CFrame: ${cframe_publish_project_PROJECT} publishing the following variables." )
+  cframe_message( STATUS 3 "CFrame: ${cframe_publish_product_PRODUCT} publishing the following variables." )
 
-  set( ${UPROJECT}_FOUND TRUE
-      CACHE INTERNAL "$(cframe_publish_project_PROJECT} project was found."
+  set( ${UPRODUCT}_FOUND TRUE
+      CACHE INTERNAL "$(cframe_publish_product_PRODUCT} product was found."
   )
   cframe_message( STATUS 3
-      "${UPROJECT}_FOUND        = ${${UPROJECT}_FOUND}"
+      "${UPRODUCT}_FOUND        = ${${UPRODUCT}_FOUND}"
   )
 
-  if ( DEFINED cframe_publish_project_VERSION )
-    set( ${UPROJECT}_VERSION ${cframe_publish_project_VERSION}
-        CACHE STRING "$(cframe_publish_project_PROJECT} project version."
+  if ( DEFINED cframe_publish_product_VERSION )
+    set( ${UPRODUCT}_VERSION ${cframe_publish_product_VERSION}
+        CACHE STRING "$(cframe_publish_product_PRODUCT} product version."
     )
     cframe_message( STATUS 3
-        "${UPROJECT}_VERSION      = ${${UPROJECT}_VERSION}"
+        "${UPRODUCT}_VERSION      = ${${UPRODUCT}_VERSION}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_project_DEFINITIONS )
-    set( ${UPROJECT}_DEFINITIONS ${cframe_publish_project_DEFINITIONS}
-        CACHE STRING "${cframe_publish_project_PROJECT} project list of definitions."
+  if ( DEFINED cframe_publish_product_DEFINITIONS )
+    set( ${UPRODUCT}_DEFINITIONS ${cframe_publish_product_DEFINITIONS}
+        CACHE STRING "${cframe_publish_product_PRODUCT} product list of definitions."
     )
     cframe_message( STATUS 3
-        "${UPROJECT}_DEFINITIONS  = ${${UPROJECT}_DEFINITIONS}"
+        "${UPRODUCT}_DEFINITIONS  = ${${UPRODUCT}_DEFINITIONS}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_project_INCLUDE_DIRS )
-    set( ${UPROJECT}_INCLUDE_DIRS ${cframe_publish_project_INCLUDE_DIRS}
-        CACHE STRING "${cframe_publish_project_PROJECT} project list of include directories."
+  if ( DEFINED cframe_publish_product_INCLUDE_DIRS )
+    set( ${UPRODUCT}_INCLUDE_DIRS ${cframe_publish_product_INCLUDE_DIRS}
+        CACHE STRING "${cframe_publish_product_PRODUCT} product list of include directories."
     )
     cframe_message( STATUS 3
-        "${UPROJECT}_INCLUDE_DIRS = ${${UPROJECT}_INCLUDE_DIRS}"
+        "${UPRODUCT}_INCLUDE_DIRS = ${${UPRODUCT}_INCLUDE_DIRS}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_project_LIBRARY_DIRS )
-    set( ${UPROJECT}_LIBRARY_DIRS ${cframe_publish_project_LIBRARY_DIRS}
-        CACHE STRING "${cframe_publish_project_PROJECT} project list of library directories."
+  if ( DEFINED cframe_publish_product_LIBRARY_DIRS )
+    set( ${UPRODUCT}_LIBRARY_DIRS ${cframe_publish_product_LIBRARY_DIRS}
+        CACHE STRING "${cframe_publish_product_PRODUCT} product list of library directories."
     )
     cframe_message( STATUS 3
-        "${UPROJECT}_LIBRARY_DIRS = ${${UPROJECT}_LIBRARY_DIRS}"
+        "${UPRODUCT}_LIBRARY_DIRS = ${${UPRODUCT}_LIBRARY_DIRS}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_project_LIBRARIES )
-    set( ${UPROJECT}_LIBRARIES ${cframe_publish_project_LIBRARIES}
-        CACHE STRING "${cframe_publish_project_PROJECT} project list of libraries."
+  if ( DEFINED cframe_publish_product_LIBRARIES )
+    set( ${UPRODUCT}_LIBRARIES ${cframe_publish_product_LIBRARIES}
+        CACHE STRING "${cframe_publish_product_PRODUCT} product list of libraries."
     )
     cframe_message( STATUS 3
-        "${UPROJECT}_LIBRARIES    = ${${UPROJECT}_LIBRARIES}"
+        "${UPRODUCT}_LIBRARIES    = ${${UPRODUCT}_LIBRARIES}"
     )
   endif()
 
-endfunction() # cframe_publish_project
+endfunction() # cframe_publish_product
 
 # -----------------------------------------------------------------------------
 #

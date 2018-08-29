@@ -34,7 +34,7 @@
 #   other dependent Projects can refer to then in a standard way. This done by
 #   using the function:
 #
-#       cframe_publish_project( PROJECT_NAME
+#       cframe_publish_project( PRODUCT_NAME
 #           VERSION      <parts of version identifier: major minor patch build, number of elements is optional>
 #           DEFINITIONS  <list of definitions>
 #           INCLUDE_DIRS <list of directories to include>
@@ -43,67 +43,68 @@
 #       )
 #
 # Global parameters used:
-#     CFRAME_PROJECTS_DIR
+#     CFRAME_PRODUCTS_DIR
+#
 # -----------------------------------------------------------------------------
 macro( cframe_prepare_projects )
 
   cframe_message( STATUS 3 "CFrame: MACRO: cframe_internal_project_prepare" )
 
-  # Assume all directories under the projects directory are projects. Make a BUILD option
+  # Assume all directories under the products directory are products. Make a BUILD option
   # for each of them.
-  file( GLOB PROJECT_DIRS
+  file( GLOB PRODUCT_DIRS
       LIST_DIRECTORIES TRUE
-      RELATIVE ${CFRAME_PROJECTS_DIR}
-      ${CFRAME_PROJECTS_DIR}/*
+      RELATIVE ${CFRAME_PRODUCTS_DIR}
+      ${CFRAME_PRODUCTS_DIR}/*
   )
-  foreach( PROJECT ${PROJECT_DIRS} )
-    if ( (IS_DIRECTORY ${CFRAME_PROJECTS_DIR}/${PROJECT}) AND
-         (EXISTS ${CFRAME_PROJECTS_DIR}/${PROJECT}/CMakeLists.txt) )
+  foreach( PRODUCT ${PRODUCT_DIRS} )
+    if ( (IS_DIRECTORY ${CFRAME_PRODUCTS_DIR}/${PRODUCT}) AND
+         (EXISTS ${CFRAME_PRODUCTS_DIR}/${PRODUCT}/CMakeLists.txt) )
 
-      list( APPEND CFRAME_BUILD_PROJECTS ${PROJECT} )
+      list( APPEND CFRAME_BUILD_PRODUCTS ${PRODUCT} )
 
-      if ( EXISTS ${CFRAME_PROJECTS_DIR}/${PROJECT}/CFrameLists.txt )
-        option( BUILD_PROJECT_${PROJECT} "Build Package ${PROJECT}" ON )
-        set( CFRAME_CURRENT_PROJECT_DIR ${CFRAME_PROJECTS_DIR}/${PROJECT} )
-        set( CFRAME_CURRENT_PROJECT_NAME ${PROJECT} )
-        include( ${CFRAME_PROJECTS_DIR}/${PROJECT}/CFrameLists.txt )
+      if ( EXISTS ${CFRAME_PRODUCTS_DIR}/${PRODUCT}/CFrameLists.txt )
+        option( BUILD_PRODUCT_${PRODUCT} "Build Product ${PRODUCT}" ON )
+        set( CFRAME_CURRENT_PRODUCT_DIR ${CFRAME_PRODUCTS_DIR}/${PRODUCT} )
+        set( CFRAME_CURRENT_PRODUCT_NAME ${PRODUCT} )
+        include( ${CFRAME_PRODUCTS_DIR}/${PRODUCT}/CFrameLists.txt )
 
         cframe_message( STATUS 4
-            "CFrame: ${PROJECT} version:      ${${PROJECT}_VERSION}"
+            "CFrame: ${PRODUCT} version:      ${${PRODUCT}_VERSION}"
         )
         cframe_message( STATUS 4
-            "CFrame: ${PROJECT} definitions:  ${${PROJECT}_DEFINITIONS}"
+            "CFrame: ${PRODUCT} definitions:  ${${PRODUCT}_DEFINITIONS}"
         )
         cframe_message( STATUS 4
-            "CFrame: ${PROJECT} include dirs: ${${PROJECT}_INCLUDE_DIRS}"
+            "CFrame: ${PRODUCT} include dirs: ${${PRODUCT}_INCLUDE_DIRS}"
         )
         cframe_message( STATUS 4
-            "CFrame: ${PROJECT} library dirs: ${${PROJECT}_LIBRARY_DIRS}"
+            "CFrame: ${PRODUCT} library dirs: ${${PRODUCT}_LIBRARY_DIRS}"
         )
         cframe_message( STATUS 4
-            "CFrame: ${PROJECT} libraries:    ${${PROJECT}_LIBRARIES}"
+            "CFrame: ${PRODUCT} libraries:    ${${PRODUCT}_LIBRARIES}"
         )
 
       else()
-        option( BUILD_PROJECT_${PROJECT} "Build Package ${PROJECT}" OFF )
+        option( BUILD_PRODUCT_${PRODUCT} "Build Package ${PRODUCT}" OFF )
         cframe_message( WARNING 2
-            "CFrame: Package: ${PROJECT} does not contain a CFrameLists.txt."
+            "CFrame: Package: ${PRODUCT} does not contain a CFrameLists.txt."
             "It will be ignored for further processing."
             "See CFrame CMake Modular Framework documentation for further information."
         )
       endif()
 
-      if ( BUILD_PROJECT_${PROJECT} )
-        if ( DEFINED ${PROJECT}_INCLUDE_DIRS )
-          cframe_message( STATUS 4 "CFrame: ${PROJECT}_INCLUDE_DIRS: ${${PROJECT}_INCLUDE_DIRS}")
-          include_directories( ${${PROJECT}_INCLUDE_DIRS} )
+      if ( BUILD_PRODUCT_${PRODUCT} MATCHES ON )
+        if ( DEFINED ${PRODUCT}_INCLUDE_DIRS )
+          cframe_message( STATUS 4 "CFrame: ${PRODUCT}_INCLUDE_DIRS: ${${PRODUCT}_INCLUDE_DIRS}")
+          include_directories( ${${PRODUCT}_INCLUDE_DIRS} )
         endif()
       endif()
 
     else()
 
       cframe_message( STATUS 2
-          "CFrame: Project ${PROJECT} is not a directory or does not contain a CMakeLists.txt, skipping"
+          "CFrame: Project ${PRODUCT} is not a directory or does not contain a CMakeLists.txt, skipping"
       )
 
     endif() # is directory and CMakeLists.txt exists
@@ -127,9 +128,9 @@ macro( cframe_setup_external_packages )
         "CFrame: Setting up external package: ${XPACKAGE} with components: ${CFRAME_EXTERNAL_${XPACKAGE}_COMPONENTS}"
     )
 
-    if ( EXISTS ${${PROJECT_NAME}_SOURCE_DIR}/share/${PROJECT_NAME}/cmake/Setup${XPACKAGE}.cmake )
-      cframe_message( STATUS 3 "CFrame: Using share/${PROJECT_NAME}/cmake/Setup${XPACKAGE}.cmake" )
-      include( ${${PROJECT_NAME}_SOURCE_DIR}/share/${PROJECT_NAME}/cmake/Setup${XPACKAGE}.cmake )
+    if ( EXISTS ${${PRODUCT_NAME}_SOURCE_DIR}/share/${PRODUCT_NAME}/cmake/Setup${XPACKAGE}.cmake )
+      cframe_message( STATUS 3 "CFrame: Using share/${PRODUCT_NAME}/cmake/Setup${XPACKAGE}.cmake" )
+      include( ${${PRODUCT_NAME}_SOURCE_DIR}/share/${PRODUCT_NAME}/cmake/Setup${XPACKAGE}.cmake )
     else()
       cframe_message( STATUS 3 "CFrame: Using standard external setup for package: ${XPACKAGE}" )
       cframe_setup_external_package( ${XPACKAGE} "${CFRAME_EXTERNAL_${XPACKAGE}_COMPONENTS}" )
@@ -160,14 +161,14 @@ macro( cframe_build_projects )
   cframe_message( STATUS 3 "CFrame: MACRO: cframe_internal_project_build" )
 
   set( CFRAME_BUILD TRUE )
-  foreach( PROJECT ${CFRAME_BUILD_PROJECTS} )
-    if ( ${BUILD_PROJECT_${PROJECT}} )
-      # @todo Find a better way to determine if CMAKE_PROJECTS_DIR is outside
+  foreach( PRODUCT ${CFRAME_BUILD_PRODUCT} )
+    if ( ${BUILD_PRODUCT_${PRODUCT}} )
+      # @todo Find a better way to determine if CMAKE_PRODUCTS_DIR is outside
       # of CFrame's source directory
-      if ( IS_ABSOLUTE ${CFRAME_PROJECTS_DIR} )
-        add_subdirectory( ${CFRAME_PROJECTS_DIR}/${PROJECT} ${PROJECT} )
+      if ( IS_ABSOLUTE ${CFRAME_PRODUCTS_DIR} )
+        add_subdirectory( ${CFRAME_PRODUCTS_DIR}/${PRODUCT} ${PRODUCT} )
       else()
-        add_subdirectory( ${CFRAME_PROJECTS_DIR}/${PROJECT} )
+        add_subdirectory( ${CFRAME_PRODUCTS_DIR}/${PRODUCT} )
       endif()
     endif()
   endforeach()
