@@ -1,20 +1,20 @@
 # -----------------------------------------------------------------------------
-# CFrameLists.txt for CFrame Demo project.
+# CFrameLists.txt for CFrame Demo package.
 # -----------------------------------------------------------------------------
 
-cframe_message( STATUS 2 "CFrame Demo Projects." )
-cframe_message( STATUS 3 "Current Project Dir: ${CFRAME_CURRENT_PROJECT_DIR}" )
-cframe_message( STATUS 3 "Current Project Name: ${CFRAME_CURRENT_PROJECT_NAME}" )
+cframe_message( STATUS 2 "CFrameDemo: Processing CFrameLists.txt." )
+cframe_message( STATUS 3 "CFrameDemo: Current Package Dir:  ${CFRAME_CURRENT_PACKAGE_DIR}" )
+cframe_message( STATUS 3 "CFrameDemo: Current Package Name: ${CFRAME_CURRENT_PACKAGE_NAME}" )
 
 # -------------------------------------------------------------------
-# Publish standard CMake variables that may be used by other projects
+# Publish standard CMake variables that may be used by other packages
 # -------------------------------------------------------------------
-cframe_publish_product(
-    PRODUCT ${CFRAME_CURRENT_PRODUCT_NAME}
+cframe_publish_package(
+    PACKAGE ${CFRAME_CURRENT_PACKAGE_NAME}
     VERSION 0 1 0 0 Beta
     DEFINITIONS
     INCLUDE_DIRS
-        ${CFRAME_CURRENT_PRODUCT_DIR}/libs/
+        ${CFRAME_CURRENT_PACKAGE_DIR}/libs/
     LIBRARY_DIRS
     LIBRARIES
         cframehello
