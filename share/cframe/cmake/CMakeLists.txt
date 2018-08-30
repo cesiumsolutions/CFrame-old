@@ -1,9 +1,8 @@
-# cframe scripts target
-
-cframe_build_custom_target(
+cframe_build_target(
     TARGET_NAME   ${PROJECT_NAME}_scripts
     PROJECT_LABEL Scripts
     GROUP         CFrameSources
+    TYPE          Custom
     FILES_PUBLIC
         CFrameBuildFunctions.cmake
         CFrameExternalPackages.cmake
@@ -14,6 +13,6 @@ cframe_build_custom_target(
         SetupQt.cmake
     FILES_PRIVATE
         CFrameInternal.cmake
-    INSTALL_DIR
+    FILES_INSTALL_DIR
         share/${PROJECT_NAME}/cmake
 )

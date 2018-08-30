@@ -30,6 +30,7 @@
 #   QT_QRCFILES         - a list of qt resource files
 #   NO_INSTALL          - Flag to indicate not to install the target in the standard location
 #   HEADERS_INSTALL_DIR - the directory to install public headers to
+#   FILES_INSTALL_DIR   - the directory to install public files to
 #
 # Global variables referenced:
 #
@@ -68,6 +69,7 @@ function( cframe_build_target )
        LINK_TYPE
        GROUP
        HEADERS_INSTALL_DIR
+       FILES_INSTALL_DIR
   )
   set( multiValueArgs
        INCLUDE_DIRS
@@ -117,6 +119,7 @@ function( cframe_build_target )
   cframe_message( STATUS 4 "QT_QRCFILES:         ${cframe_build_target_QT_QRCFILES}" )
   cframe_message( STATUS 4 "NO_INSTALL:          ${cframe_build_target_NO_INSTALL}" )
   cframe_message( STATUS 4 "HEADERS_INSTALL_DIR: ${cframe_build_target_HEADERS_INSTALL_DIR}" )
+  cframe_message( STATUS 4 "FILES_INSTALL_DIR:   ${cframe_build_target_FILES_INSTALL_DIR}" )
 
   # ------------------------------------
   # Preliminary Build checks and filters
@@ -188,6 +191,7 @@ function( cframe_build_target )
   set( _QT_QRCFILES          ${cframe_build_target_QT_QRCFILES} )
   set( _NO_INSTALL           ${cframe_build_target_NO_INSTALL} )
   set( _HEADERS_INSTALL_DIR  ${cframe_build_target_HEADERS_INSTALL_DIR} )
+  set( _FILES_INSTALL_DIR    ${cframe_build_target_FILES_INSTALL_DIR} )
 
   # Apply fine-grained build filters on a per file level using the CFRAME_FILE_EXCLUDE_LIST
 ##  cframe_filter_list( _HEADERS_PUBLIC  CFRAME_FILE_EXCLUDE_LIST )
@@ -338,6 +342,8 @@ function( cframe_build_target )
   set( ${cframe_build_target_TARGET_NAME}_ALL_FILES
       ${cframe_build_target_HEADERS_PUBLIC}
       ${cframe_build_target_HEADERS_PRIVATE}
+      ${cframe_build_target_FILES_PUBLIC}
+      ${cframe_build_target_FILES_PRIVATE}
       ${cframe_build_target_SOURCES}
       ${cframe_build_target_QT_MOCFILES}
       ${${cframe_build_target_TARGET_NAME}_MOCSOURCES}
@@ -495,7 +501,8 @@ function( cframe_build_target )
   endif()
 
   # install standard target artifacts
-  if ( NOT cframe_build_target_NO_INSTALL )
+  if ( NOT cframe_build_target_NO_INSTALL AND
+       NOT "${cframe_build_target_TYPE}" STREQUAL "CUSTOM" )
       install(
           TARGETS ${cframe_build_target_TARGET_NAME}
           RUNTIME DESTINATION ${CFRAME_INSTALL_BIN_DIR} COMPONENT Runtime
@@ -521,120 +528,4 @@ function( cframe_build_target )
     )
   endif()
 
-endfunction() # IGS_BUILD_TARGET
-
-# -----------------------------------------------------------------------------
-# Function to encapsulate the most common standard steps for building a custom
-# target
-#
-# Parameters:
-#   TARGET_NAME        - name of the target to build
-#   PROJECT_LABEL      - name to display in IDEs, if not specified defaults to TARGET_NAME
-#   GROUP              - The organization group to place the library in (for IDE build environments)
-#   FILES_PUBLIC       - a list of files that will be installed
-#   FILES_PRIVATE      - a list of files that will not be installed
-#   INSTALL_DIR        - the directory to install the files to
-#
-# Global variables referenced:
-#   CFRAME_VERBOSITY
-#
-# Global variables defined/modified:
-#
-#  BUILD_TARGET_${TARGET_NAME} - defines option
-#  BUILD_GROUP_${GROUP}        - defines option
-#
-# @todo Merge with cframe_build_target
-# -----------------------------------------------------------------------------
-function( cframe_build_custom_target )
-
-  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_build_custom_target" )
-
-  # -----------------------------------
-  # Set up and parse multiple arguments
-  # -----------------------------------
-  set( options
-  )
-  set( oneValueArgs
-      TARGET_NAME
-      PROJECT_LABEL
-      GROUP
-      INSTALL_DIR
-  )
-  set( multiValueArgs
-      FILES_PUBLIC
-      FILES_PRIVATE
-  )
-
-  cmake_parse_arguments(
-      cframe_build_custom_target
-      "${options}"
-      "${oneValueArgs}"
-      "${multiValueArgs}"
-      ${ARGN}
-  )
-
-  cframe_message( STATUS 4 "CFrame: Parameters for cframe_build_custom_target:" )
-  cframe_message( STATUS 4 "TARGET_NAME:    ${cframe_build_custom_target_TARGET_NAME}" )
-  cframe_message( STATUS 4 "PROJECT_LABEL:  ${cframe_build_custom_target_PROJECT_LABEL}" )
-  cframe_message( STATUS 4 "GROUP:          ${cframe_build_custom_target_GROUP}" )
-  cframe_message( STATUS 4 "FILES:          ${cframe_build_custom_target_FILES}" )
-  cframe_message( STATUS 4 "INSTALL_DIR:    ${cframe_build_custom_target_INSTALL_DIR}" )
-  cframe_message( STATUS 4 "DEBUG:          ${cframe_build_custom_target_DEBUG}" )
-
-  # Apply filtering toggles at the Project level
-  if ( NOT DEFINED cframe_build_custom_target_TARGET_NAME )
-     cframe_message( WARNING 1
-         "CFrame: No NAME parameter specified"
-     )
-    return()
-  else()
-    option( BUILD_TARGET_${cframe_build_custom_target_TARGET_NAME} "Set ON to build target ${cframe_build_custom_target_TARGET_NAME}." ON )
-    if ( BUILD_TARGET_${cframe_build_custom_target_TARGET_NAME} MATCHES OFF )
-      cframe_message( STATUS 3 "CFrame: Skipping target: ${cframe_build_custom_target_TARGET_NAME}" )
-      return()
-    else()
-      cframe_message( STATUS 4 "CFrame: Building target: ${cframe_build_custom_target_TARGET_NAME}" )
-    endif()
-  endif()
-
-  # Apply filtering toggles at the Group level
-  if ( DEFINED cframe_build_custom_target_GROUP )
-    option( BUILD_GROUP_${cframe_build_custom_target_GROUP} "Set ON to build group ${cframe_build_custom_target_GROUP}." ON )
-    if ( BUILD_GROUP_${cframe_build_custom_target_GROUP} MATCHES OFF )
-      cframe_message( STATUS 3 "CFrame: Skipping group: ${cframe_build_custom_target_GROUP}" )
-      return()
-    else()
-      cframe_message( STATUS 4 "CFrame: Building group: ${cframe_build_custom_target_GROUP}" )
-    endif()
-  endif()
-
-  add_custom_target(
-      ${cframe_build_custom_target_TARGET_NAME}
-      SOURCES
-          ${cframe_build_custom_target_FILES_PUBLIC}
-          ${cframe_build_custom_target_FILES_PRIVATE}
-  )
-  if ( DEFINED cframe_build_custom_target_GROUP )
-    set_target_properties(
-        ${cframe_build_custom_target_TARGET_NAME}
-        PROPERTIES
-            FOLDER ${cframe_build_custom_target_GROUP}
-    )
-  endif()
-  if ( DEFINED cframe_build_custom_target_PROJECT_LABEL )
-    set_target_properties(
-        ${cframe_build_custom_target_TARGET_NAME}
-        PROPERTIES
-            PROJECT_LABEL ${cframe_build_custom_target_PROJECT_LABEL}
-    )
-  endif()
-
-  if ( DEFINED cframe_build_custom_target_FILES_PUBLIC AND
-       DEFINED cframe_build_custom_target_INSTALL_DIR )
-    install(
-        FILES ${cframe_build_custom_target_FILES_PUBLIC}
-        DESTINATION ${cframe_build_custom_target_INSTALL_DIR}
-    )
-  endif()
-
-endfunction() # cframe_build_custom_target
+endfunction() # cframe_build_target
