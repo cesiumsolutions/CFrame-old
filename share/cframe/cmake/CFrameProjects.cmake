@@ -1,15 +1,15 @@
 # -----------------------------------------------------------------------------
 #
-# Contains Project-related setup functions.
+# Contains Package and Project-related setup functions.
 #
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
 #
 # -----------------------------------------------------------------------------
-function( cframe_publish_product )
+function( cframe_publish_package )
 
-  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_publish_product")
+  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_publish_package")
 
   # -----------------------------------
   # Set up and parse multiple arguments
@@ -17,7 +17,7 @@ function( cframe_publish_product )
   set( options
   )
   set( oneValueArgs
-      PRODUCT
+      PACKAGE
   )
   set( multiValueArgs
       VERSION
@@ -28,91 +28,91 @@ function( cframe_publish_product )
   )
 
   cmake_parse_arguments(
-      cframe_publish_product
+      cframe_publish_package
       "${options}"
       "${oneValueArgs}"
       "${multiValueArgs}"
       ${ARGN}
   )
 
-  cframe_message( STATUS 4 "Parameters for cframe_publish_product:" )
-  cframe_message( STATUS 4 "PRODUCT:       ${cframe_publish_product_PRODUCT}" )
-  cframe_message( STATUS 4 "VERSION:       ${cframe_publish_product_VERSION}" )
-  cframe_message( STATUS 4 "DEFINITIONS:   ${cframe_publish_product_DEFINITIONS}" )
-  cframe_message( STATUS 4 "INCLUDE_DIRS:  ${cframe_publish_product_INCLUDE_DIRS}" )
-  cframe_message( STATUS 4 "LIBRARY_DIRS:  ${cframe_publish_product_LIBRARY_DIRS}" )
-  cframe_message( STATUS 4 "LIBRARIES:     ${cframe_publish_product_LIBRARIES}" )
+  cframe_message( STATUS 4 "Parameters for cframe_publish_package:" )
+  cframe_message( STATUS 4 "PACKAGE:       ${cframe_publish_package_PACKAGE}" )
+  cframe_message( STATUS 4 "VERSION:       ${cframe_publish_package_VERSION}" )
+  cframe_message( STATUS 4 "DEFINITIONS:   ${cframe_publish_package_DEFINITIONS}" )
+  cframe_message( STATUS 4 "INCLUDE_DIRS:  ${cframe_publish_package_INCLUDE_DIRS}" )
+  cframe_message( STATUS 4 "LIBRARY_DIRS:  ${cframe_publish_package_LIBRARY_DIRS}" )
+  cframe_message( STATUS 4 "LIBRARIES:     ${cframe_publish_package_LIBRARIES}" )
 
   # Check that minimal values are defined and valid
-  if ( NOT DEFINED cframe_publish_product_PRODUCT )
-    cframe_message( WARNING 1 "CFrame: cframe_publish_product no PRODUCT parameter specified" )
+  if ( NOT DEFINED cframe_publish_package_PACKAGE )
+    cframe_message( WARNING 1 "CFrame: cframe_publish_package no PACKAGE parameter specified" )
     return()
   endif()
 
-  string( TOUPPER ${cframe_publish_product_PRODUCT} UPRODUCT )
+  string( TOUPPER ${cframe_publish_package_PACKAGE} UPACKAGE )
 
-  cframe_message( STATUS 3 "CFrame: ${cframe_publish_product_PRODUCT} publishing the following variables." )
+  cframe_message( STATUS 3 "CFrame: ${cframe_publish_package_PACKAGE} publishing the following variables." )
 
-  set( ${UPRODUCT}_FOUND TRUE
-      CACHE INTERNAL "$(cframe_publish_product_PRODUCT} product was found."
+  set( ${UPACKAGE}_FOUND TRUE
+      CACHE INTERNAL "$(cframe_publish_package_PACKAGE} package was found."
   )
   cframe_message( STATUS 3
-      "${UPRODUCT}_FOUND        = ${${UPRODUCT}_FOUND}"
+      "${UPACKAGE}_FOUND        = ${${UPACKAGE}_FOUND}"
   )
 
-  if ( DEFINED cframe_publish_product_VERSION )
-    set( ${UPRODUCT}_VERSION ${cframe_publish_product_VERSION}
-        CACHE STRING "$(cframe_publish_product_PRODUCT} product version."
+  if ( DEFINED cframe_publish_package_VERSION )
+    set( ${UPACKAGE}_VERSION ${cframe_publish_package_VERSION}
+        CACHE STRING "$(cframe_publish_package_PACKAGE} package version."
     )
     cframe_message( STATUS 3
-        "${UPRODUCT}_VERSION      = ${${UPRODUCT}_VERSION}"
+        "${UPACKAGE}_VERSION      = ${${UPACKAGE}_VERSION}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_product_DEFINITIONS )
-    set( ${UPRODUCT}_DEFINITIONS ${cframe_publish_product_DEFINITIONS}
-        CACHE STRING "${cframe_publish_product_PRODUCT} product list of definitions."
+  if ( DEFINED cframe_publish_package_DEFINITIONS )
+    set( ${UPACKAGE}_DEFINITIONS ${cframe_publish_package_DEFINITIONS}
+        CACHE STRING "${cframe_publish_package_PACKAGE} package list of definitions."
     )
     cframe_message( STATUS 3
-        "${UPRODUCT}_DEFINITIONS  = ${${UPRODUCT}_DEFINITIONS}"
+        "${UPACKAGE}_DEFINITIONS  = ${${UPACKAGE}_DEFINITIONS}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_product_INCLUDE_DIRS )
-    set( ${UPRODUCT}_INCLUDE_DIRS ${cframe_publish_product_INCLUDE_DIRS}
-        CACHE STRING "${cframe_publish_product_PRODUCT} product list of include directories."
+  if ( DEFINED cframe_publish_package_INCLUDE_DIRS )
+    set( ${UPACKAGE}_INCLUDE_DIRS ${cframe_publish_package_INCLUDE_DIRS}
+        CACHE STRING "${cframe_publish_package_PACKAGE} package list of include directories."
     )
     cframe_message( STATUS 3
-        "${UPRODUCT}_INCLUDE_DIRS = ${${UPRODUCT}_INCLUDE_DIRS}"
+        "${UPACKAGE}_INCLUDE_DIRS = ${${UPACKAGE}_INCLUDE_DIRS}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_product_LIBRARY_DIRS )
-    set( ${UPRODUCT}_LIBRARY_DIRS ${cframe_publish_product_LIBRARY_DIRS}
-        CACHE STRING "${cframe_publish_product_PRODUCT} product list of library directories."
+  if ( DEFINED cframe_publish_package_LIBRARY_DIRS )
+    set( ${UPACKAGE}_LIBRARY_DIRS ${cframe_publish_package_LIBRARY_DIRS}
+        CACHE STRING "${cframe_publish_package_PACKAGE} package list of library directories."
     )
     cframe_message( STATUS 3
-        "${UPRODUCT}_LIBRARY_DIRS = ${${UPRODUCT}_LIBRARY_DIRS}"
+        "${UPACKAGE}_LIBRARY_DIRS = ${${UPACKAGE}_LIBRARY_DIRS}"
     )
   endif()
 
-  if ( DEFINED cframe_publish_product_LIBRARIES )
-    set( ${UPRODUCT}_LIBRARIES ${cframe_publish_product_LIBRARIES}
-        CACHE STRING "${cframe_publish_product_PRODUCT} product list of libraries."
+  if ( DEFINED cframe_publish_package_LIBRARIES )
+    set( ${UPACKAGE}_LIBRARIES ${cframe_publish_package_LIBRARIES}
+        CACHE STRING "${cframe_publish_package_PACKAGE} package list of libraries."
     )
     cframe_message( STATUS 3
-        "${UPRODUCT}_LIBRARIES    = ${${UPRODUCT}_LIBRARIES}"
+        "${UPACKAGE}_LIBRARIES    = ${${UPACKAGE}_LIBRARIES}"
     )
   endif()
 
-endfunction() # cframe_publish_product
+endfunction() # cframe_publish_package
 
 # -----------------------------------------------------------------------------
 #
 # -----------------------------------------------------------------------------
-macro( cframe_setup_subdir )
+macro( cframe_setup_project_subdir )
 
-  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_setup_subdir")
+  cframe_message( STATUS 3 "CFrame: FUNCTION: cframe_setup_project_subdir")
 
   # -----------------------------------
   # Set up and parse multiple arguments
@@ -135,35 +135,35 @@ macro( cframe_setup_subdir )
   )
 
   cmake_parse_arguments(
-      cframe_setup_subdir
+      cframe_setup_project_subdir
       "${options}"
       "${oneValueArgs}"
       "${multiValueArgs}"
       ${ARGN}
   )
 
-  cframe_message( STATUS 4 "Parameters for cframe_setup_subdir:" )
-  cframe_message( STATUS 4 "PREFIX:               ${cframe_setup_subdir_PREFIX}" )
-  cframe_message( STATUS 4 "SUBDIR:               ${cframe_setup_subdir_SUBDIR}" )
-  cframe_message( STATUS 4 "FOLDER:               ${cframe_setup_subdir_FOLDER}" )
-  cframe_message( STATUS 4 "HEADERS_INSTALL_DIR:  ${cframe_setup_subdir_HEADERS_INSTALL_DIR}" )
-  cframe_message( STATUS 4 "FILES_INSTALL_DIR:    ${cframe_setup_subdir_FILESS_INSTALL_DIR}" )
-  cframe_message( STATUS 4 "HEADERS_PUBLIC:       ${cframe_setup_subdir_HEADERS_PUBLIC}" )
-  cframe_message( STATUS 4 "HEADERS_PRIVATE:      ${cframe_setup_subdir_HEADERS_PRIVATE}" )
-  cframe_message( STATUS 4 "FILES_PUBLIC:         ${cframe_setup_subdir_FILES_PUBLIC}" )
-  cframe_message( STATUS 4 "FILES_PRIVATE:        ${cframe_setup_subdir_FILES_PRIVATE}" )
-  cframe_message( STATUS 4 "SOURCES:              ${cframe_setup_subdir_SOURCES}" )
+  cframe_message( STATUS 4 "Parameters for cframe_setup_project_subdir:" )
+  cframe_message( STATUS 4 "PREFIX:               ${cframe_setup_project_subdir_PREFIX}" )
+  cframe_message( STATUS 4 "SUBDIR:               ${cframe_setup_project_subdir_SUBDIR}" )
+  cframe_message( STATUS 4 "FOLDER:               ${cframe_setup_project_subdir_FOLDER}" )
+  cframe_message( STATUS 4 "HEADERS_INSTALL_DIR:  ${cframe_setup_project_subdir_HEADERS_INSTALL_DIR}" )
+  cframe_message( STATUS 4 "FILES_INSTALL_DIR:    ${cframe_setup_project_subdir_FILESS_INSTALL_DIR}" )
+  cframe_message( STATUS 4 "HEADERS_PUBLIC:       ${cframe_setup_project_subdir_HEADERS_PUBLIC}" )
+  cframe_message( STATUS 4 "HEADERS_PRIVATE:      ${cframe_setup_project_subdir_HEADERS_PRIVATE}" )
+  cframe_message( STATUS 4 "FILES_PUBLIC:         ${cframe_setup_project_subdir_FILES_PUBLIC}" )
+  cframe_message( STATUS 4 "FILES_PRIVATE:        ${cframe_setup_project_subdir_FILES_PRIVATE}" )
+  cframe_message( STATUS 4 "SOURCES:              ${cframe_setup_project_subdir_SOURCES}" )
 
-  set( PREFIX               ${cframe_setup_subdir_PREFIX} )
-  set( SUBDIR               ${cframe_setup_subdir_SUBDIR} )
-  set( FOLDER               ${cframe_setup_subdir_FOLDER} )
-  set( HEADERS_INSTALL_DIR  ${cframe_setup_subdir_HEADERS_INSTALL_DIR} )
-  set( FILES_INSTALL_DIR    ${cframe_setup_subdir_FILESS_INSTALL_DIR} )
-  set( HEADERS_PUBLIC       ${cframe_setup_subdir_HEADERS_PUBLIC} )
-  set( HEADERS_PRIVATE      ${cframe_setup_subdir_HEADERS_PRIVATE} )
-  set( FILES_PUBLIC         ${cframe_setup_subdir_FILES_PUBLIC} )
-  set( FILES_PRIVATE        ${cframe_setup_subdir_FILES_PRIVATE} )
-  set( SOURCES              ${cframe_setup_subdir_SOURCES} )
+  set( PREFIX               ${cframe_setup_project_subdir_PREFIX} )
+  set( SUBDIR               ${cframe_setup_project_subdir_SUBDIR} )
+  set( FOLDER               ${cframe_setup_project_subdir_FOLDER} )
+  set( HEADERS_INSTALL_DIR  ${cframe_setup_project_subdir_HEADERS_INSTALL_DIR} )
+  set( FILES_INSTALL_DIR    ${cframe_setup_project_subdir_FILESS_INSTALL_DIR} )
+  set( HEADERS_PUBLIC       ${cframe_setup_project_subdir_HEADERS_PUBLIC} )
+  set( HEADERS_PRIVATE      ${cframe_setup_project_subdir_HEADERS_PRIVATE} )
+  set( FILES_PUBLIC         ${cframe_setup_project_subdir_FILES_PUBLIC} )
+  set( FILES_PRIVATE        ${cframe_setup_project_subdir_FILES_PRIVATE} )
+  set( SOURCES              ${cframe_setup_project_subdir_SOURCES} )
 
   # Allow the case for a SUBDIR which is actually the current directory, in which case
   # SUBDIR should be undefined and the SEP will also remain undefined below
@@ -210,22 +210,22 @@ macro( cframe_setup_subdir )
       ${${PREFIX}_SOURCES}
   )
 
-  if ( DEFINED cframe_setup_subdir_HEADERS_INSTALL_DIR )
+  if ( DEFINED cframe_setup_project_subdir_HEADERS_INSTALL_DIR )
     install(
         FILES
             ${${PREFIX}_HEADERS_PUBLIC}
         DESTINATION
-            ${cframe_setup_subdir_HEADERS_INSTALL_DIR}
+            ${cframe_setup_project_subdir_HEADERS_INSTALL_DIR}
     )
   endif()
 
-  if (DEFINED cframe_setup_subdir_FILES_INSTALL_DIR )
+  if (DEFINED cframe_setup_project_subdir_FILES_INSTALL_DIR )
     install(
         FILES
             ${${PREFIX}_FILES_PUBLIC}
         DESTINATION
-            ${cframe_setup_subdir_FILES_INSTALL_DIR}
+            ${cframe_setup_project_subdir_FILES_INSTALL_DIR}
     )
   endif()
 
-endmacro() # cframe_setup_subdir
+endmacro() # cframe_setup_project_subdir
