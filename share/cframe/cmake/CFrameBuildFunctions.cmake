@@ -5,7 +5,8 @@
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
-# Function to encapsulate the most common standard steps for building a target
+# Function to encapsulate the most common standard steps for building a target.
+#
 # Parameters:
 #   TARGET_NAME         - name of the target to build
 #   OUTPUT_NAME         - name of the output, if not specified, uses TARGET_NAME
@@ -44,12 +45,10 @@
 #  BUILD_TARGET_${TARGET_NAME} - defines option
 #  BUILD_GROUP_${GROUP}        - defines option
 #
-# @todo Add DEFINE_SYMBOL option(?)
+# @todo Add "Test" target TYPE - Note: CMake uses "TEST" as a keyword :(
 # @todo Allow building of both STATIC and SHARED libraries simultaneously
-# @todo integrate processing of Custom TYPE
-# @todo Automatically set target type as Custom if no sources are found so as
-#       to automate transition between header-only and compiled libraries.
 # @todo Add specification of any number of FILTER_TAGS to be used for filtering.
+# @todo Add DEFINE_SYMBOL option(?)
 # -----------------------------------------------------------------------------
 function( cframe_build_target )
 
@@ -154,13 +153,14 @@ function( cframe_build_target )
   endif()
 
   # Check for valid Type
+  string( TOUPPER ${cframe_build_target_TYPE} cframe_build_target_TYPE )
   if ( NOT DEFINED cframe_build_target_TYPE )
     cframe_message( WARNING 1 "CFrame: cframe_build_target no TYPE parameter specified" )
     return()
-  elseif ( NOT ( (${cframe_build_target_TYPE} STREQUAL "Library") OR
-                 (${cframe_build_target_TYPE} STREQUAL "Executable") OR
-                 (${cframe_build_target_TYPE} STREQUAL "Test") OR
-                 (${cframe_build_target_TYPE} STREQUAL "Custom") ) )
+  elseif ( NOT ( (${cframe_build_target_TYPE} STREQUAL "LIBRARY") OR
+                 (${cframe_build_target_TYPE} STREQUAL "EXECUTABLE") OR
+##                 (${cframe_build_target_TYPE} STREQUAL "TEST") OR
+                 (${cframe_build_target_TYPE} STREQUAL "CUSTOM") ) )
     cframe_message( FATAL_ERROR 0
         "CFrame: cframe_build_target invalid type: ${cframe_build_target_TYPE}"
     )
@@ -348,10 +348,30 @@ function( cframe_build_target )
       ${${cframe_build_target_TARGET_NAME}_RESOURCES}
   )
 
-  if ( ${cframe_build_target_TYPE} STREQUAL "Library" )
+  set( ${cframe_build_target_TARGET_NAME}_ALL_SOURCES
+      ${cframe_build_target_SOURCES}
+      ${${cframe_build_target_TARGET_NAME}_MOCSOURCES}
+      ${${cframe_build_target_TARGET_NAME}_UISOURCES}
+      ${${cframe_build_target_TARGET_NAME}_RESOURCES}
+  )
+
+  # If no sources (either specified or generated) were found, sppecify target
+  # type as "Custom"
+  if ( ("${${cframe_build_target_TARGET_NAME}_ALL_SOURCES}" STREQUAL "") AND
+       ("${cframe_build_target_TYPE}" STREQUAL "LIBRARY") )
+    set( cframe_build_target_TYPE "CUSTOM" )
+    cframe_message( STATUS 1
+        "CFrame: Automatically setting target ${cframe_build_target_TARGET_NAME}
+           as Custom type because no sources (neither specified nor generated) were
+           found."
+    )
+  endif() # Automatic conversion to "Custom" type
+
+  if ( "${cframe_build_target_TYPE}" STREQUAL "LIBRARY" )
+
     # Only add the static definition for the library if a special link type isn't specified
     if ( DEFINED cframe_build_target_LINK_TYPE )
-      if ( cframe_build_target_LINK_TYPE STREQUAL "STATIC" )
+      if ( "cframe_build_target_LINK_TYPE" STREQUAL "STATIC" )
         add_definitions( -D${cframe_build_target_TARGET_NAME}_STATIC )
       endif()
     elseif ( NOT BUILD_SHARED_LIBS )
@@ -361,18 +381,42 @@ function( cframe_build_target )
         ${cframe_build_target_TARGET_NAME} ${LINK_TYPE}
         ${${cframe_build_target_TARGET_NAME}_ALL_FILES}
     )
-    if ( cframe_build_target_LINK_TYPE STREQUAL "DYNAMIC" )
+    if ( "cframe_build_target_LINK_TYPE" STREQUAL "DYNAMIC" )
       set_target_properties(
           ${cframe_build_target_TARGET_NAME} PROPERTIES
           LINK_DEPENDS_NO_SHARED TRUE
       )
     endif()
-  elseif( ${cframe_build_target_TYPE} STREQUAL "Executable" )
+
+##  elseif( ("${cframe_build_target_TYPE}" STREQUAL "EXECUTABLE") OR
+##          ("${cframe_build_target_TYPE}" STREQUAL "TEST") )
+  elseif( "${cframe_build_target_TYPE}" STREQUAL "EXECUTABLE" )
+
     add_executable(
         ${cframe_build_target_TARGET_NAME}
         ${${cframe_build_target_TARGET_NAME}_ALL_FILES}
     )
-  endif()
+
+##    if ( "${cframe_build_target_TYPE}" STREQUAL "TEST" )
+##      get_target_property(
+##          TEST_EXECUTABLE ${cframe_build_target_TARGET_NAME} LOCATION
+##      )
+##
+##      string( REGEX
+##              REPLACE "\\$\\(.*\\)" "\${CTEST_CONFIGURATION_TYPE}"
+##              TEST_EXECUTABLE "${TEST_EXECUTABLE}"
+##      )
+##
+##      add_test( ${TESTNAME} ${TEST_EXECUTABLE} )
+##    endif() # Test type
+
+  elseif( "${cframe_build_target_TYPE}" STREQUAL "CUSTOM" )
+    add_custom_target(
+        ${cframe_build_target_TARGET_NAME}
+        SOURCES
+            ${${cframe_build_target_TARGET_NAME}_ALL_FILES}
+    )
+  endif() # Custom type
 
   # Set the output name if it is defined and different than the target name
   # And set the DEFINE_SYMBOL to the OUTPUT_NAME to ensure consistency with the actual output name.
@@ -385,6 +429,7 @@ function( cframe_build_target )
           DEFINE_SYMBOL ${cframe_build_target_OUTPUT_NAME}_EXPORTS
       )
   endif()
+
   if ( DEFINED cframe_build_target_PROJECT_LABEL )
       set_target_properties(
           ${cframe_build_target_TARGET_NAME} PROPERTIES
