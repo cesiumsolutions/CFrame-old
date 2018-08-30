@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
-# Function to encapsulate all the standard steps for building a target
+# Function to encapsulate the most common standard steps for building a target
 # Parameters:
 #   TARGET_NAME         - name of the target to build
 #   OUTPUT_NAME         - name of the output, if not specified, uses TARGET_NAME
@@ -38,6 +38,18 @@
 #   CFRAME_INSTALL_BIN_DIR
 #   CFRAME_INSTALL_LIB_DIR
 #   CFRAME_INSTALL_DEV_DIR
+#
+# Global variables defined/modified:
+#
+#  BUILD_TARGET_${TARGET_NAME} - defines option
+#  BUILD_GROUP_${GROUP}        - defines option
+#
+# @todo Add DEFINE_SYMBOL option(?)
+# @todo Allow building of both STATIC and SHARED libraries simultaneously
+# @todo integrate processing of Custom TYPE
+# @todo Automatically set target type as Custom if no sources are found so as
+#       to automate transition between header-only and compiled libraries.
+# @todo Add specification of any number of FILTER_TAGS to be used for filtering.
 # -----------------------------------------------------------------------------
 function( cframe_build_target )
 
@@ -84,27 +96,27 @@ function( cframe_build_target )
   )
 
   cframe_message( STATUS 4 "Parameters for cframe_build_target:" )
-  cframe_message( STATUS 4 "TARGET_NAME:        ${cframe_build_target_TARGET_NAME}" )
-  cframe_message( STATUS 4 "OUTPUT_NAME:        ${cframe_build_target_OUTPUT_NAME}" )
-  cframe_message( STATUS 4 "PROJECT_LABEL:      ${cframe_build_target_PROJECT_LABEL}" )
-  cframe_message( STATUS 4 "TYPE:               ${cframe_build_target_TYPE}" )
-  cframe_message( STATUS 4 "LINK_TYPE:          ${cframe_build_target_LINK_TYPE}" )
-  cframe_message( STATUS 4 "GROUP:              ${cframe_build_target_GROUP}" )
-  cframe_message( STATUS 4 "INCLUDE_DIRS:       ${cframe_build_target_INCLUDE_DIRS}" )
-  cframe_message( STATUS 4 "DEFINES:            ${cframe_build_target_DEFINES}" )
-  cframe_message( STATUS 4 "COMPILE_FLAGS:      ${cframe_build_target_COMPILE_FLAGS}" )
-  cframe_message( STATUS 4 "LINK_FLAGS:         ${cframe_build_target_LINK_FLAGS}" )
-  cframe_message( STATUS 4 "LIBRARY_DIRS:       ${cframe_build_target_LIBRARY_DIRS}" )
-  cframe_message( STATUS 4 "LIBRARIES:          ${cframe_build_target_LIBRARIES}" )
-  cframe_message( STATUS 4 "HEADERS_PUBLIC:     ${cframe_build_target_HEADERS_PUBLIC}" )
-  cframe_message( STATUS 4 "HEADERS_PRIVATE:    ${cframe_build_target_HEADERS_PRIVATE}" )
-  cframe_message( STATUS 4 "FILES_PUBLIC:       ${cframe_build_target_FILES_PUBLIC}" )
-  cframe_message( STATUS 4 "FILES_PRIVATE:      ${cframe_build_target_FILES_PRIVATE}" )
-  cframe_message( STATUS 4 "SOURCES:            ${cframe_build_target_SOURCES}" )
-  cframe_message( STATUS 4 "QT_MOCFILES:        ${cframe_build_target_QT_MOCFILES}" )
-  cframe_message( STATUS 4 "QT_UIFILES:         ${cframe_build_target_QT_UIFILES}" )
-  cframe_message( STATUS 4 "QT_QRCFILES:        ${cframe_build_target_QT_QRCFILES}" )
-  cframe_message( STATUS 4 "NO_INSTALL:         ${cframe_build_target_NO_INSTALL}" )
+  cframe_message( STATUS 4 "TARGET_NAME:         ${cframe_build_target_TARGET_NAME}" )
+  cframe_message( STATUS 4 "OUTPUT_NAME:         ${cframe_build_target_OUTPUT_NAME}" )
+  cframe_message( STATUS 4 "PROJECT_LABEL:       ${cframe_build_target_PROJECT_LABEL}" )
+  cframe_message( STATUS 4 "TYPE:                ${cframe_build_target_TYPE}" )
+  cframe_message( STATUS 4 "LINK_TYPE:           ${cframe_build_target_LINK_TYPE}" )
+  cframe_message( STATUS 4 "GROUP:               ${cframe_build_target_GROUP}" )
+  cframe_message( STATUS 4 "INCLUDE_DIRS:        ${cframe_build_target_INCLUDE_DIRS}" )
+  cframe_message( STATUS 4 "DEFINES:             ${cframe_build_target_DEFINES}" )
+  cframe_message( STATUS 4 "COMPILE_FLAGS:       ${cframe_build_target_COMPILE_FLAGS}" )
+  cframe_message( STATUS 4 "LINK_FLAGS:          ${cframe_build_target_LINK_FLAGS}" )
+  cframe_message( STATUS 4 "LIBRARY_DIRS:        ${cframe_build_target_LIBRARY_DIRS}" )
+  cframe_message( STATUS 4 "LIBRARIES:           ${cframe_build_target_LIBRARIES}" )
+  cframe_message( STATUS 4 "HEADERS_PUBLIC:      ${cframe_build_target_HEADERS_PUBLIC}" )
+  cframe_message( STATUS 4 "HEADERS_PRIVATE:     ${cframe_build_target_HEADERS_PRIVATE}" )
+  cframe_message( STATUS 4 "FILES_PUBLIC:        ${cframe_build_target_FILES_PUBLIC}" )
+  cframe_message( STATUS 4 "FILES_PRIVATE:       ${cframe_build_target_FILES_PRIVATE}" )
+  cframe_message( STATUS 4 "SOURCES:             ${cframe_build_target_SOURCES}" )
+  cframe_message( STATUS 4 "QT_MOCFILES:         ${cframe_build_target_QT_MOCFILES}" )
+  cframe_message( STATUS 4 "QT_UIFILES:          ${cframe_build_target_QT_UIFILES}" )
+  cframe_message( STATUS 4 "QT_QRCFILES:         ${cframe_build_target_QT_QRCFILES}" )
+  cframe_message( STATUS 4 "NO_INSTALL:          ${cframe_build_target_NO_INSTALL}" )
   cframe_message( STATUS 4 "HEADERS_INSTALL_DIR: ${cframe_build_target_HEADERS_INSTALL_DIR}" )
 
   # ------------------------------------
@@ -121,12 +133,12 @@ function( cframe_build_target )
     cframe_message( WARNING 1 "CFrame: cframe_build_target no TARGET_NAME parameter specified" )
     return()
   else()
-    option( BUILD_PROJECT_${cframe_build_target_TARGET_NAME} "Set ON to build project ${cframe_build_target_TARGET_NAME}." ON )
-    if ( BUILD_PROJECT_${cframe_build_target_TARGET_NAME} MATCHES OFF )
-      cframe_message( STATUS 3 "CFrame: Skipping project: ${cframe_build_target_TARGET_NAME}" )
+    option( BUILD_TARGET_${cframe_build_target_TARGET_NAME} "Set ON to build target ${cframe_build_target_TARGET_NAME}." ON )
+    if ( BUILD_TARGET_${cframe_build_target_TARGET_NAME} MATCHES OFF )
+      cframe_message( STATUS 3 "CFrame: Skipping target: ${cframe_build_target_TARGET_NAME}" )
       return()
     else()
-      cframe_message( STATUS 4 "CFrame: Building project: ${cframe_build_target_TARGET_NAME}" )
+      cframe_message( STATUS 4 "CFrame: Building target: ${cframe_build_target_TARGET_NAME}" )
     endif()
   endif()
 
@@ -177,9 +189,11 @@ function( cframe_build_target )
   set( _NO_INSTALL           ${cframe_build_target_NO_INSTALL} )
   set( _HEADERS_INSTALL_DIR  ${cframe_build_target_HEADERS_INSTALL_DIR} )
 
-  # Apply fine-grained build filters on a per file level using the IGS_FILE_EXCLUDE_LIST
+  # Apply fine-grained build filters on a per file level using the CFRAME_FILE_EXCLUDE_LIST
 ##  cframe_filter_list( _HEADERS_PUBLIC  CFRAME_FILE_EXCLUDE_LIST )
 ##  cframe_filter_list( _HEADERS_PRIVATE CFRAME_FILE_EXCLUDE_LIST )
+##  cframe_filter_list( _FILES_PUBLIC    CFRAME_FILE_EXCLUDE_LIST )
+##  cframe_filter_list( _FILES_PRIVATE   CFRAME_FILE_EXCLUDE_LIST )
 ##  cframe_filter_list( _SOURCES         CFRAME_FILE_EXCLUDE_LIST )
 ##  cframe_filter_list( _QT_MOCFILES     CFRAME_FILE_EXCLUDE_LIST )
 ##  cframe_filter_list( _QT_UIFILES      CFRAME_FILE_EXCLUDE_LIST )
@@ -248,8 +262,8 @@ function( cframe_build_target )
 
     cframe_message( STATUS 3
         "CFrame: ${cframe_build_target_TARGET_NAME} Generated UI Files: "
-        "${${IGS_BUILD_TARGET}_UIHEADERS}"
-        "${${IGS_BUILD_TARGET}_UIHEADERS}"
+        "${${cframe_build_target_TARGET_NAME}_UIHEADERS}"
+        "${${cframe_build_target_TARGET_NAME}_UISOURCES}"
     )
   endif()
 
@@ -394,6 +408,9 @@ function( cframe_build_target )
       )
   endif()
 
+  # -----------------------------------
+  # Set various other target properties
+  # -----------------------------------
   set_property(
       SOURCE ${cframe_build_target_HEADERS_PUBLIC}
       PROPERTY PUBLIC_HEADER
@@ -405,6 +422,7 @@ function( cframe_build_target )
           DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
   )
 
+  # set the target group
   if ( DEFINED cframe_build_target_GROUP )
       set_target_properties(
           ${cframe_build_target_TARGET_NAME} PROPERTIES
@@ -412,6 +430,7 @@ function( cframe_build_target )
       )
   endif()
 
+  # set PIC on shared libraries
   if ( NOT WIN32 AND NOT BUILD_SHARED_LIBS )
       # Ensure that static libraries use position independent code on Linux
       set_target_properties(
@@ -419,6 +438,8 @@ function( cframe_build_target )
           POSITION_INDEPENDENT_CODE ON
       )
   endif()
+
+  # set target compile flags
   if ( DEFINED cframe_build_target_COMPILE_FLAGS OR DEFINED CFRAME_OS_COMPILE_FLAGS )
       set_target_properties(
           ${cframe_build_target_TARGET_NAME} PROPERTIES
@@ -428,6 +449,7 @@ function( cframe_build_target )
       )
   endif()
 
+  # install standard target artifacts
   if ( NOT cframe_build_target_NO_INSTALL )
       install(
           TARGETS ${cframe_build_target_TARGET_NAME}
@@ -437,6 +459,7 @@ function( cframe_build_target )
       )
   endif()
 
+  # install public headers
   if ( DEFINED cframe_build_target_HEADERS_INSTALL_DIR )
       install(
           FILES ${cframe_build_target_HEADERS_PUBLIC}
@@ -444,10 +467,21 @@ function( cframe_build_target )
       )
   endif()
 
+  # install public files
+  if ( DEFINED cframe_build_target_FILES_PUBLIC AND
+       DEFINED cframe_build_target_FILES_INSTALL_DIR )
+    install(
+        FILES ${cframe_build_target_FILES_PUBLIC}
+        DESTINATION ${cframe_build_target_FILES_INSTALL_DIR}
+    )
+  endif()
+
 endfunction() # IGS_BUILD_TARGET
 
 # -----------------------------------------------------------------------------
-# Function to encapsulate all the standard steps for building a custom target
+# Function to encapsulate the most common standard steps for building a custom
+# target
+#
 # Parameters:
 #   TARGET_NAME        - name of the target to build
 #   PROJECT_LABEL      - name to display in IDEs, if not specified defaults to TARGET_NAME
@@ -458,6 +492,13 @@ endfunction() # IGS_BUILD_TARGET
 #
 # Global variables referenced:
 #   CFRAME_VERBOSITY
+#
+# Global variables defined/modified:
+#
+#  BUILD_TARGET_${TARGET_NAME} - defines option
+#  BUILD_GROUP_${GROUP}        - defines option
+#
+# @todo Merge with cframe_build_target
 # -----------------------------------------------------------------------------
 function( cframe_build_custom_target )
 
@@ -502,12 +543,12 @@ function( cframe_build_custom_target )
      )
     return()
   else()
-    option( BUILD_PROJECT_${cframe_build_custom_target_TARGET_NAME} "Set ON to build project ${cframe_build_custom_target_TARGET_NAME}." ON )
-    if ( BUILD_PROJECT_${cframe_build_custom_target_TARGET_NAME} MATCHES OFF )
-      cframe_message( STATUS 3 "CFrame: Skipping project: ${cframe_build_custom_target_TARGET_NAME}" )
+    option( BUILD_TARGET_${cframe_build_custom_target_TARGET_NAME} "Set ON to build target ${cframe_build_custom_target_TARGET_NAME}." ON )
+    if ( BUILD_TARGET_${cframe_build_custom_target_TARGET_NAME} MATCHES OFF )
+      cframe_message( STATUS 3 "CFrame: Skipping target: ${cframe_build_custom_target_TARGET_NAME}" )
       return()
     else()
-      cframe_message( STATUS 4 "CFrame: Building project: ${cframe_build_custom_target_TARGET_NAME}" )
+      cframe_message( STATUS 4 "CFrame: Building target: ${cframe_build_custom_target_TARGET_NAME}" )
     endif()
   endif()
 
@@ -542,7 +583,6 @@ function( cframe_build_custom_target )
             PROJECT_LABEL ${cframe_build_custom_target_PROJECT_LABEL}
     )
   endif()
-
 
   if ( DEFINED cframe_build_custom_target_FILES_PUBLIC AND
        DEFINED cframe_build_custom_target_INSTALL_DIR )
