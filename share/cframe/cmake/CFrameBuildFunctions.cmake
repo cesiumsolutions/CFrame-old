@@ -31,6 +31,7 @@
 #   NO_INSTALL          - Flag to indicate not to install the target in the standard location
 #   HEADERS_INSTALL_DIR - the directory to install public headers to
 #   FILES_INSTALL_DIR   - the directory to install public files to
+#   BINARY_INSTALL_DIR  - the directory (prefix) where compiled targets will be installed to
 #
 # Global variables referenced:
 #
@@ -70,6 +71,7 @@ function( cframe_build_target )
        GROUP
        HEADERS_INSTALL_DIR
        FILES_INSTALL_DIR
+       BINARY_INSTALL_DIR
   )
   set( multiValueArgs
        INCLUDE_DIRS
@@ -120,6 +122,7 @@ function( cframe_build_target )
   cframe_message( STATUS 4 "NO_INSTALL:          ${cframe_build_target_NO_INSTALL}" )
   cframe_message( STATUS 4 "HEADERS_INSTALL_DIR: ${cframe_build_target_HEADERS_INSTALL_DIR}" )
   cframe_message( STATUS 4 "FILES_INSTALL_DIR:   ${cframe_build_target_FILES_INSTALL_DIR}" )
+  cframe_message( STATUS 4 "BINARY_INSTALL_DIR:  ${cframe_build_target_BINARY_INSTALL_DIR}" )
 
   # ------------------------------------
   # Preliminary Build checks and filters
@@ -192,6 +195,7 @@ function( cframe_build_target )
   set( _NO_INSTALL           ${cframe_build_target_NO_INSTALL} )
   set( _HEADERS_INSTALL_DIR  ${cframe_build_target_HEADERS_INSTALL_DIR} )
   set( _FILES_INSTALL_DIR    ${cframe_build_target_FILES_INSTALL_DIR} )
+  set( _BINARY_INSTALL_DIR   ${cframe_build_target_BINARY_INSTALL_DIR} )
 
   # Apply fine-grained build filters on a per file level using the CFRAME_FILE_EXCLUDE_LIST
 ##  cframe_filter_list( _HEADERS_PUBLIC  CFRAME_FILE_EXCLUDE_LIST )
@@ -503,11 +507,14 @@ function( cframe_build_target )
   # install standard target artifacts
   if ( NOT cframe_build_target_NO_INSTALL AND
        NOT "${cframe_build_target_TYPE}" STREQUAL "CUSTOM" )
+      if ( DEFINED cframe_build_target_BINARY_INSTALL_DIR )
+        set( BINARY_INSTALL_PREFIX ${cframe_build_target_BINARY_INSTALL_DIR}/ )
+      endif()
       install(
           TARGETS ${cframe_build_target_TARGET_NAME}
-          RUNTIME DESTINATION ${CFRAME_INSTALL_BIN_DIR} COMPONENT Runtime
-          LIBRARY DESTINATION ${CFRAME_INSTALL_LIB_DIR} COMPONENT Runtime
-          ARCHIVE DESTINATION ${CFRAME_INSTALL_DEV_DIR} COMPONENT Development
+          RUNTIME DESTINATION ${BINARY_INSTALL_PREFIX}${CFRAME_INSTALL_BIN_DIR} COMPONENT Runtime
+          LIBRARY DESTINATION ${BINARY_INSTALL_PREFIX}${CFRAME_INSTALL_LIB_DIR} COMPONENT Runtime
+          ARCHIVE DESTINATION ${BINARY_INSTALL_PREFIX}${CFRAME_INSTALL_DEV_DIR} COMPONENT Development
       )
   endif()
 
