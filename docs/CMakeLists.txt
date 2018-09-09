@@ -6,6 +6,8 @@ cframe_build_target(
     FILES_PUBLIC
         License.md
         Manual.md
+        QuickStart.md
+        ../README.md
     FILES_INSTALL_DIR
         docs/${PROJECT_NAME}
 )
