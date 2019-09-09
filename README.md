@@ -15,10 +15,12 @@ of the provided facilities.
 The purpose is to provide a common standard framework to take care of much
 of the boilerplate code and to avoid having to copy CMake script files
 between projects. Also, a project can be divided up into smaller components
-which allows one to more selectively choose exactly what is built.
+which allows one to be more selective with what is built.
 
 The [Quick Start Guide](./docs/QuickStart.md) provides the basic information
 to setup a project using CFrame.  
 The [User's Manual](./docs/Manual.md) provides a more in depth guide for using
 CFrame.  
+The [Reference Guide](./docs/ReferenceGuide.md) provides a references for all
+functions and variables provided by CFrame.
 License information can be found [here](.docs/License.md).
