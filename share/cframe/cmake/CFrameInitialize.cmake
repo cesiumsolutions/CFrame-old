@@ -24,7 +24,7 @@ set( CFRAME_INSTALL_DEV_DIR lib
 
 set( BUILD_SHARED_LIBS ON )
 set( CMAKE_DEBUG_POSTFIX d )
-set( CMAKE_CXX_STANDARD 11 )
+set( CMAKE_CXX_STANDARD 14 )
 set_property( GLOBAL PROPERTY USE_FOLDERS ON )
 
 if ( WIN32 )
@@ -37,6 +37,10 @@ if ( WIN32 )
     set( CMAKE_CXX_FLAGS_${UCONFIG} "${CMAKE_CXX_FLAGS_${UCONFIG}} ${PLATFORM_FLAGS}" )
     set( CMAKE_C_FLAGS_${UCONFIG} "${CMAKE_C_FLAGS_${UCONFIG}} ${PLATFORM_FLAGS}" )
   endforeach()
+
+  set( CFRAME_LOADER_LIBRARIES
+      Dbghelp.lib
+  )
 endif()
 
 include_directories( testtools )
