@@ -14,6 +14,7 @@ set( CFrameSubSystemsPath ${CFrameCorePath}/../subsystems )
 include( ${CFrameCorePath}/Messaging.cmake )
 include( ${CFrameCorePath}/UnitTestInternal.cmake )
 include( ${CFrameCorePath}/ListUtils.cmake )
+include( ${CFrameCorePath}/SubsystemUtils.cmake )
 
 #include core implementation unit test files
 option( CFRAME_UNIT_TEST "Toggle unit testing of CFrame functions" FALSE )
@@ -65,14 +66,10 @@ function( cframe_initialize )
   #
   foreach( subSystem ${subSystems} )
     if ( NOT ${subSystem} STREQUAL "messaging" )
-      cframe_message(
-          MODE STATUS
-          VERBOSITY 2
-          TAGS CFrame
-          MESSAGE "Initializing Subsystem: ${subSystem}"
+      cframe_subsystem_initialize(
+          ${subSystem}
+          ${CFrameSubSystemsPath}/${subSystem}
       )
-      string( TOLOWER ${subSystem} subDir )
-      include( ${CFrameSubSystemsPath}/${subSystem}/Initialize.cmake )
     endif()
   endforeach()
 
