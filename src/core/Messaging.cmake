@@ -83,7 +83,7 @@ endfunction() # cframe_would_message
 # @param MODE The message Mode, @see CMake message
 # @param VERBOSITY The verbosity associated with the messages
 # @param TAGS A list of freeform text associated with the message, used for filtering.
-# @param The message
+# @param MESSAGE The message
 # -----------------------------------------------------------------------------
 function( cframe_message )
   

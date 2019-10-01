@@ -14,6 +14,7 @@ set( CFrameSubSystemsPath ${CFrameCorePath}/../subsystems )
 include( ${CFrameCorePath}/Messaging.cmake )
 include( ${CFrameCorePath}/UnitTestInternal.cmake )
 include( ${CFrameCorePath}/ListUtils.cmake )
+include( ${CFrameCorePath}/DirectoryUtils.cmake )
 include( ${CFrameCorePath}/SubsystemUtils.cmake )
 
 #include core implementation unit test files
@@ -23,6 +24,7 @@ if ( ${CFRAME_UNIT_TEST} )
   cframe_start_internal_tests()
   include( ${CFrameCorePath}/tests/MessagingTests.cmake )
   include( ${CFrameCorePath}/tests/ListUtilsTests.cmake )
+  include( ${CFrameCorePath}/tests/DirectoryUtilsTests.cmake )
   cframe_finish_internal_tests()
 endif()
 
