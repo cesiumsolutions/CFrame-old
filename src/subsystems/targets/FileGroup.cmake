@@ -1,34 +1,37 @@
-#
+# ------------------------------------------------------------------------------
 # @brief Logically groups a list of files together
 # @ingroup targets
+#
 # Single valued arguments:
-# @param [in] GROUPNAME:   The name of the group to assign to the files. In some #                          IDEs (e.g. Visual Studio), the files will be shown in
-#                          an organizational folder.
-# @param [in] INSTALL_DIR: The directory to install the files. If not specified,
-#                          the files will not be installed (at least not using
-#                          this function).
-# @param [out] OUTVAR:     The name of the variable to assign the filename list to.
-# @param [in] VERBOSITY:   The verbosity level to use for any messages (default: 1)
+# @param [in] GROUPNAME:    The name of the group to assign to the files. In some
+#                           IDEs (e.g. Visual Studio), the files will be shown in
+#                           an organizational folder.
+# @param [out] OUTVAR:      The name of the variable to assign the filename list to.
+# @param [in] VERBOSITY:    The verbosity level to use for any messages (default: 1)
 #
 # Multi-valued arguments:
-# @param [in] FILES:       The list of files to group together
-# @param [in] PROPERTIES:  A list of properties to assign to the files.
+# @param [in] FILES:        The list of files to group together
+# @param [in] PROPERTIES:   A list of properties to assign to the files.
+# @param [in] INSTALL_DIRS: The directory(ies) to install the files to. If not
+#                           specified, the files will not be installed (at least
+#                           not using this function).
 #
 # Example:
 # @code
 # cframe_file_group(
 #     GROUPNAME Data
-#     OUTVAR    DATAFILES
+#     OUTVAR    DATA_FILES
 #     FILES
 #         widgets.dat
 #         gadgets.dat
 #         thingamajigs.dat
 #         shims.txt
 #         shams.csv
-#     INSTALL_DIR projects/data
+#     INSTALL_DIRS
+#         projects/data
 # )
 # @endcode
-#
+# ------------------------------------------------------------------------------
 function( cframe_file_group )
 
   set( verbosity 1 )
@@ -37,12 +40,12 @@ function( cframe_file_group )
   set( oneValueArgs
       GROUPNAME
       OUTVAR
-      INSTALL_DIR
       VERBOSITY
   )
   set( multiValueArgs
       FILES
       PROPERTIES
+      INSTALL_DIRS
   )
 
   cmake_parse_arguments(
@@ -53,8 +56,8 @@ function( cframe_file_group )
       ${ARGN}
   )
 
-  if ( DEFINED cframe_search_subdirs_VERBOSITY )
-    set( verbosity ${cframe_search_subdirs_VERBOSITY} )
+  if ( DEFINED cframe_file_group_VERBOSITY )
+    set( verbosity ${cframe_file_group_VERBOSITY} )
   endif()
  
   list( LENGTH cframe_file_group_FILES numFiles )
@@ -63,7 +66,7 @@ function( cframe_file_group )
         MODE FATAL_ERROR
         TAGS CFrame Targets
         VERBOSITY ${verbosity}
-        MESSAGE "cframe_file_group() FILES not specified, aborting"
+        MESSAGE "cframe_file_group() FILES not specified or empty, aborting"
     )
   endif()
 
@@ -86,11 +89,13 @@ function( cframe_file_group )
     )
   endif()
 
-  if ( DEFINED cframe_file_group_INSTALL_DIR )
-    install(
-        FILES ${cframe_file_group_FILES}
-        DESTINATION ${cframe_file_group_INSTALL_DIR}
-    )
+  if ( DEFINED cframe_file_group_INSTALL_DIRS )
+    foreach( installDir ${cframe_file_group_INSTALL_DIRS} )
+      install(
+          FILES ${cframe_file_group_FILES}
+          DESTINATION ${installDir}
+      )
+    endforeach()
   endif()
 
 endfunction() # cframe_file_group

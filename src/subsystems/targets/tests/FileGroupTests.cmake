@@ -1,13 +1,13 @@
 # -----------------------------------------------------------------------------
 #
-# Unit Tests for the Filter Utility functions
+# Unit Tests for the FileGroup functions
 #
 # -----------------------------------------------------------------------------
 
 # List Utils Unit Tests
 if ( ${CFRAME_UNIT_TEST} )
 
-  # cframe_list_equal tests
+  # cframe_file_group tests
   cframe_message(
       MODE STATUS
       VERBOSITY 2
