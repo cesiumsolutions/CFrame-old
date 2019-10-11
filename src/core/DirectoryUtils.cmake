@@ -117,7 +117,7 @@ function( cframe_search_subdirs )
     )
   endif()
 
-  if ( NOT DEFINED cframe_search_subdirs_OUTVAR )
+  if ( DEFINED cframe_search_subdirs_OUTVAR )
     set( outVar ${cframe_search_subdirs_OUTVAR} )
   else ()
     cframe_message(
