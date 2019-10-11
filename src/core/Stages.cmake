@@ -137,7 +137,7 @@ function( cframe_process )
     )
   endforeach()
 
-endfunction() # cframe_postprocess
+endfunction() # cframe_process
 
 # ------------------------------------------------------------------------------
 # @brief Executes the Postprocess stage of each of the registered Subsystems.
