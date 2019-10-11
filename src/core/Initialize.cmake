@@ -28,9 +28,9 @@ if ( ${CFRAME_UNIT_TEST} )
   cframe_finish_internal_tests()
 endif()
 
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function( cframe_initialize )
 
   cframe_message(
@@ -40,9 +40,9 @@ function( cframe_initialize )
       MESSAGE cframe_initialize()
   )
 
-  set( subSystems "" )
+  set( subSystems ${CFrameSubsystems} )
 
-  # If no arguments are passed, load all available SubSystems which are subdirs
+  # If no arguments are passed, load all available Subsystems which are subdirs
   # of the subsystems directory
   if ( ${ARGC} EQUAL 0 )
     file( GLOB subDirs RELATIVE ${CFrameSubSystemsPath} ${CFrameSubSystemsPath}/* )
@@ -53,26 +53,110 @@ function( cframe_initialize )
     endforeach()
  else()
 
-    # Make a subSystems variable which contains a set (no duplicates) of the
+    # Make a CFramSubSystems variable which contains a set (no duplicates) of the
     # function arguments converted to lower case
     foreach( arg ${ARGV} )
       string( TOLOWER ${arg} argLower )
       list( APPEND subSystems ${argLower} )
     endforeach()
-    list( REMOVE_DUPLICATES subSystems )
     
   endif()
+
+  list( REMOVE_DUPLICATES subSystems )
+  # Maintain a list of all explicitly specified or automatically discovered
+  # subsystems
+  set( CFrameSubsystems "${subSystems}"
+      CACHE INTERNAL "CFrame's subsystems"
+  )
 
   #
   # Initialize each of the other Subsystems
   #
-  foreach( subSystem ${subSystems} )
-    if ( NOT ${subSystem} STREQUAL "messaging" )
-      cframe_subsystem_initialize(
-          ${subSystem}
-          ${CFrameSubSystemsPath}/${subSystem}
-      )
-    endif()
+  foreach( subSystem ${CFrameSubsystems} )
+    cframe_subsystem_stage(
+        ${subSystem}
+        ${CFrameSubSystemsPath}/${subSystem}
+        "Initialize"
+    )
   endforeach()
 
+  #
+  # Call the test phase if testing is enabled
+  #
+  if ( ${CFRAME_UNIT_TEST} )
+    foreach( subSystem ${CFrameSubsystems} )
+      cframe_subsystem_stage(
+          ${subSystem}
+          ${CFrameSubSystemsPath}/${subSystem}
+          "tests"
+      )
+    endforeach()
+  endif()
+
 endfunction() # cframe_initialize
+
+# ------------------------------------------------------------------------------
+# @brief Executes the Preprocess stage of each of the registered Subsystems.
+# ------------------------------------------------------------------------------
+function( cframe_preprocess )
+
+  cframe_message(
+      MODE STATUS
+      VERBOSITY 5
+      TAGS CFrame
+      MESSAGE cframe_preprocess()
+  )
+
+  foreach( subSystem ${CFrameSubsystems} )
+    cframe_subsystem_stage(
+        ${subSystem}
+        ${CFrameSubSystemsPath}/${subSystem}
+        "Preprocess"
+    )
+  endforeach()
+
+endfunction() # cframe_preprocess
+
+# ------------------------------------------------------------------------------
+# @brief Executes the Process stage of each of the registered Subsystems.
+# ------------------------------------------------------------------------------
+function( cframe_process )
+
+  cframe_message(
+      MODE STATUS
+      VERBOSITY 5
+      TAGS CFrame
+      MESSAGE cframe_process()
+  )
+
+  foreach( subSystem ${CFrameSubsystems} )
+    cframe_subsystem_stage(
+        ${subSystem}
+        ${CFrameSubSystemsPath}/${subSystem}
+        "Process"
+    )
+  endforeach()
+
+endfunction() # cframe_postprocess
+
+# ------------------------------------------------------------------------------
+# @brief Executes the Postprocess stage of each of the registered Subsystems.
+# ------------------------------------------------------------------------------
+function( cframe_postprocess )
+
+  cframe_message(
+      MODE STATUS
+      VERBOSITY 5
+      TAGS CFrame
+      MESSAGE cframe_postprocess()
+  )
+
+  foreach( subSystem ${CFrameSubsystems} )
+    cframe_subsystem_stage(
+        ${subSystem}
+        ${CFrameSubSystemsPath}/${subSystem}
+        "Postprocess"
+    )
+  endforeach()
+
+endfunction() # cframe_postprocess
