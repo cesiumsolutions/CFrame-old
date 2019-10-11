@@ -27,14 +27,14 @@ function( cframe_subsystem_stage name dir stage )
 
   # If there is a file in the subsystem's directory named ${stage}.cmake, just
   # include that file.
-  if ( EXISTS dir/${stage}.cmake )
-    include( dir/${stage}.cmake )
+  if ( EXISTS ${dir}/${stage}.cmake )
+    include( ${dir}/${stage}.cmake )
     return()
   endif()
 
   # If there is a subdirectory in the subsystem's directory named ${stage},
   # include all of the files in that subdirectory.
-  if ( IS_DIRECTORY dir/${stage} )
+  if ( IS_DIRECTORY ${dir}/${stage} )
     file(
         GLOB entries
         ${dir}/${stage}/*
