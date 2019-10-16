@@ -104,4 +104,4 @@ if ( ${CFRAME_UNIT_TEST} )
       "Recurse=false, StopWhenFound=false"
   )
 
-endif()
+endif() # CFRAME_UNIT_TEST

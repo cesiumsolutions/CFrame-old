@@ -22,18 +22,20 @@ endfunction() # cframe_files_relative_paths
 #
 function( cframe_search_subdir_impl dir filename recursive stopWhenFound outVar )
 
-  ##message( "cframe_search_subdir_impl: ${dir} ${filename} ${recursive} ${stopWhenFound} ${outVar}" )
+  message( "cframe_search_subdir_impl: ${dir} ${filename} ${recursive} ${stopWhenFound} ${outVar}" )
 
   if ( EXISTS ${dir}/${filename} )
     list( APPEND results ${dir} )
     if ( ${stopWhenFound} )
       set( ${outVar} ${results} PARENT_SCOPE )
+message( "A: results: ${results}" )
       return()
     endif()
   endif()
 
   if ( NOT ${recursive} )
     set( ${outVar} ${results} PARENT_SCOPE )
+message( "B: results: ${results}" )
     return()
   endif()
 
@@ -42,6 +44,7 @@ function( cframe_search_subdir_impl dir filename recursive stopWhenFound outVar 
       RELATIVE ${dir}
       ${dir}/*
   )
+message( "chidren: ${children}" )
 
   foreach( child ${children} )
     if ( IS_DIRECTORY ${dir}/${child} )
@@ -52,14 +55,38 @@ function( cframe_search_subdir_impl dir filename recursive stopWhenFound outVar 
       )
     endif()
   endforeach()
+message( "C: results: ${results}" )
 
   set( ${outVar} ${results} PARENT_SCOPE )
 
 endfunction() # cframe_search_subdir_impl
 
+# ------------------------------------------------------------------------------
+# @brief Searches subdirectories for given file returning list of paths containing
+#        file.
+# Options:
+# @param RECURSIVE [in] True if directory should recurse subdirs (default: TRUE)
+# @param STOPWHENFOUND [in] True if search terminates after first file is found
+#                          (default: FALSE)
+# One value args:
+# @param FILENAME [in] The name of the file to search for
+# @param OUTVAR [out] The name of the variable to store the results in
+# @param VERBOSITY [in] The verbosity level to use for messages (default: 1)
+# Multivalue args:
+# @param ROOTDIRS [in] List of paths to directories to search for file
 #
-#
-#
+# For example:
+# @code
+# cframe_search_subdirs(
+#     FILENAME CMakeLists.txt
+#     ROOTDIRS
+#         projects
+#         special/subprojA
+#         optional/src/subsystem
+#     OUTVAR paths
+# )
+# @endcode
+# ------------------------------------------------------------------------------
 function( cframe_search_subdirs )
 
   ##message( "cframe_search_subdirs" )
@@ -100,7 +127,7 @@ function( cframe_search_subdirs )
   else()
     cframe_message(
         MODE FATAL_ERROR
-        TAGS CFrame
+        TAGS CFrame DirectoryUtils
         VERBOSITY ${verbosity}
         MESSAGE "cframe_search_dirs() ROOTDIRS not specified, aborting"
     )
@@ -111,18 +138,16 @@ function( cframe_search_subdirs )
   else()
     cframe_message(
         MODE FATAL_ERROR
-        TAGS CFrame
+        TAGS CFrame DirectoryUtils
         VERBOSITY ${verbosity}
         MESSAGE "cframe_search_dirs() FILENAME not specified, aborting"
     )
   endif()
 
-  if ( DEFINED cframe_search_subdirs_OUTVAR )
-    set( outVar ${cframe_search_subdirs_OUTVAR} )
-  else ()
+  if ( NOT DEFINED cframe_search_subdirs_OUTVAR )
     cframe_message(
         MODE FATAL_ERROR
-        TAGS CFrame
+        TAGS CFrame DirectoryUtils
         VERBOSITY ${verbosity}
         MESSAGE "cframe_search_dirs() OUTVAR not specified, aborting"
     )
@@ -136,10 +161,9 @@ function( cframe_search_subdirs )
   endif()
 
   ##message( "filename: ${filename}" )
-  ##message( "outVar: ${outVar}" )
   ##message( "recursive: ${recursive}" )
   ##message( "stopWhenFound: ${stopWhenFound}" )
-  ##message( "rootDirs: ${rootDirs}" )
+  message( "rootDirs: ${rootDirs}" )
 
   foreach( dir ${cframe_search_subdirs_ROOTDIRS} )
     cframe_search_subdir_impl(
@@ -150,5 +174,7 @@ function( cframe_search_subdirs )
   endforeach()
 
   set( ${cframe_search_subdirs_OUTVAR} ${results} PARENT_SCOPE )
+
+message( "results: ${results}" )
 
 endfunction() # cframe_search_subdirs
