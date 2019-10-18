@@ -22,20 +22,18 @@ endfunction() # cframe_files_relative_paths
 #
 function( cframe_search_subdir_impl dir filename recursive stopWhenFound outVar )
 
-  message( "cframe_search_subdir_impl: ${dir} ${filename} ${recursive} ${stopWhenFound} ${outVar}" )
+  ##message( "cframe_search_subdir_impl: ${dir} ${filename} ${recursive} ${stopWhenFound} ${outVar}" )
 
   if ( EXISTS ${dir}/${filename} )
     list( APPEND results ${dir} )
     if ( ${stopWhenFound} )
       set( ${outVar} ${results} PARENT_SCOPE )
-message( "A: results: ${results}" )
       return()
     endif()
   endif()
 
   if ( NOT ${recursive} )
     set( ${outVar} ${results} PARENT_SCOPE )
-message( "B: results: ${results}" )
     return()
   endif()
 
@@ -44,7 +42,6 @@ message( "B: results: ${results}" )
       RELATIVE ${dir}
       ${dir}/*
   )
-message( "chidren: ${children}" )
 
   foreach( child ${children} )
     if ( IS_DIRECTORY ${dir}/${child} )
@@ -55,7 +52,6 @@ message( "chidren: ${children}" )
       )
     endif()
   endforeach()
-message( "C: results: ${results}" )
 
   set( ${outVar} ${results} PARENT_SCOPE )
 
@@ -163,7 +159,7 @@ function( cframe_search_subdirs )
   ##message( "filename: ${filename}" )
   ##message( "recursive: ${recursive}" )
   ##message( "stopWhenFound: ${stopWhenFound}" )
-  message( "rootDirs: ${rootDirs}" )
+  ##message( "rootDirs: ${rootDirs}" )
 
   foreach( dir ${cframe_search_subdirs_ROOTDIRS} )
     cframe_search_subdir_impl(
@@ -174,7 +170,5 @@ function( cframe_search_subdirs )
   endforeach()
 
   set( ${cframe_search_subdirs_OUTVAR} ${results} PARENT_SCOPE )
-
-message( "results: ${results}" )
 
 endfunction() # cframe_search_subdirs
