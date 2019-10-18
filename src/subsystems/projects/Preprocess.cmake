@@ -7,7 +7,7 @@
 # all found project directories.
 foreach( project ${CFRAME_PROJECTS} )
 
-  # We want to allow specifying subdirectories of the CURRENT_SOURCE_DIR, but
+  # We want to allow specifying subdirectories of the CURRENT_SOURCE_DIR, but for
   # processing, it is easier to be consistent and assume all paths are absolute.
   # So prepend the CURRENT_SOURCE_DIR if project is  a subdirectory, otherwise
   # use as is.
@@ -25,7 +25,22 @@ foreach( project ${CFRAME_PROJECTS} )
       RECURSIVE STOPWHENFOUND
   )
   
-  # @todo CHeck if projectDirs is empty and give a message if so
+  # Check if projectDirs is empty and give a message if so
+  if ( projectDirs )
+    list( LENGTH projectDirs numProjectDirs )
+  else()
+    set( numProjectDirs 0 )
+  endif()
+  if ( ${numProjectDirs} EQUAL 0 )
+    cframe_message(
+        MODE WARNING
+        VERBOSITY 2
+        TAGS CFrame Projects
+        MESSAGE
+            "No projects found in project directory: ${rootDir}"
+            " or directory is invalid"
+    )
+  endif()
 
   foreach( projectDir ${projectDirs} )
 
