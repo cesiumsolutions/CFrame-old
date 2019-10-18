@@ -22,7 +22,8 @@ message( "${CMAKE_CURRENT_LIST_DIR}/Initialize.cmake" )
 #
 # /dev
 #     /project  (Directory where the main project's CMakeLists.txt file is)
-#         /src
+#         /other
+#             /experiment
 #     /other
 #         /experiment - Contains a CMakeLists.txt file
 # /other/experiment   - Contains another CMakeLists.txt different than the previous
