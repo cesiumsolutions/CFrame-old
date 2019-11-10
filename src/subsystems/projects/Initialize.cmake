@@ -4,7 +4,6 @@
 #        project subsystem variables
 # ------------------------------------------------------------------------------
 
-message( "${CMAKE_CURRENT_LIST_DIR}/Initialize.cmake" )
 
 # Variable: CFRAME_PROJECTS
 # Is a list of directories to search for projects (CMakeLists.txt) files.

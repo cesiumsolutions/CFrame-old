@@ -4,3 +4,4 @@
 # ------------------------------------------------------------------------------
 
 include( ${CMAKE_CURRENT_LIST_DIR}/FileGroup.cmake )
+include( ${CMAKE_CURRENT_LIST_DIR}/Target.cmake )

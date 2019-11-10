@@ -7,8 +7,9 @@
 # all found project directories.
 foreach( project ${CFRAME_PROJECTS} )
 
-  # We want to allow specifying subdirectories of the CURRENT_SOURCE_DIR, but for
-  # processing, it is easier to be consistent and assume all paths are absolute.
+  # We want to allow specifying subdirectories of the CURRENT_SOURCE_DIR as well
+  # as directories outside of the source tree. But for processing, it is easier
+  # to be consistent and assume all paths are absolute.
   # So prepend the CURRENT_SOURCE_DIR if project is  a subdirectory, otherwise
   # use as is.
   if ( EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${project} )
@@ -55,7 +56,6 @@ foreach( project ${CFRAME_PROJECTS} )
     file( RELATIVE_PATH relPathNative ${CMAKE_CURRENT_SOURCE_DIR} ${projectDir}  )
     file( TO_CMAKE_PATH ${relPathNative} relPath )
     string( LENGTH ${relPath} relPathLength )
-    message( "relPath: ${relPath} : ${relPathLength}" )
 
     string( SUBSTRING ${relPath} 0 3 relPrefix )
     while( ${relPrefix} STREQUAL "../" )
@@ -64,7 +64,13 @@ foreach( project ${CFRAME_PROJECTS} )
       string( SUBSTRING ${relPath} 0 3 relPrefix )
     endwhile()
 
-    message( "binary path: ${relPath}" )
+    cframe_message(
+        MODE STATUS
+        VERBOSITY 3
+        TAGS CFrame Projects
+        MESSAGE
+            "Adding project dir: ${projectDir} using binary dir: ${relPath}"
+    )
     add_subdirectory( ${projectDir} ${relPath} )
 
   endforeach() # projectDirs
