@@ -4,6 +4,15 @@
 #
 # -----------------------------------------------------------------------------
 
+set(
+    CFRAME_SOURCE_DISPLAY_MODE "TREE"
+    CACHE STRING "Mode for displaying sources in IDEs such as Visual Studio"
+)
+set_property(
+    CACHE CFRAME_SOURCE_DISPLAY_MODE
+    PROPERTY STRINGS TREE FLAT DEFAULT
+)
+
 # -----------------------------------------------------------------------------
 # Function to encapsulate the most common standard steps for building a target.
 #
@@ -35,7 +44,7 @@
 #
 # Global variables referenced:
 #
-#   CFRAME_FLAT_SOURCE_TREE   - whether to use a flat organization structure for the source (for IDE build environments)
+#   CFRAME_SOURCE_DISPLAY_MODE - controls how sources are displayed in IDEs: FLAT, TREE, DEFAULT
 #   CFRAME_VERBOSITY
 #   CFRAME_OS_COMPILE_FLAGS
 #   CFRAME_INSTALL_BIN_DIR
@@ -376,6 +385,24 @@ function( cframe_build_target )
            found."
     )
   endif() # Automatic conversion to "Custom" type
+
+
+  if ( "${CFRAME_SOURCE_DISPLAY_MODE}" STREQUAL "FLAT" )
+    source_group(
+        \\ FILES
+        ${cframe_build_target_HEADERS_PUBLIC}
+        ${cframe_build_target_HEADERS_PRIVATE}
+        ${cframe_build_target_SOURCES}
+    )
+  elseif ( "${CFRAME_SOURCE_DISPLAY_MODE}" STREQUAL "TREE" )
+    source_group(
+        TREE ${CMAKE_CURRENT_SOURCE_DIR}
+        FILES
+            ${cframe_build_target_HEADERS_PUBLIC}
+            ${cframe_build_target_HEADERS_PRIVATE}
+            ${cframe_build_target_SOURCES}
+    )
+  endif()
 
   if ( "${cframe_build_target_TYPE}" STREQUAL "LIBRARY" )
 
