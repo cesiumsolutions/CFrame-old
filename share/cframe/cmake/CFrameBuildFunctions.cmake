@@ -448,6 +448,18 @@ function( cframe_build_target )
                 ${cframe_build_target_HEADERS_PRIVATE}
                 ${cframe_build_target_FILES_PRIVATE}
     )
+    ## HACK: Interfaces don't show up in IDEs, so make a custom target
+    message( STATUS
+        "CFrame: Adding custom target for interface: "
+        "${cframe_build_target_TARGET_NAME}_display"
+    )
+    add_custom_target( ${cframe_build_target_TARGET_NAME}_display
+        SOURCES
+            ${cframe_build_target_HEADERS_PUBLIC}
+            ${cframe_build_target_FILES_PUBLIC}
+            ${cframe_build_target_HEADERS_PRIVATE}
+            ${cframe_build_target_FILES_PRIVATE}
+    )
 
 ##    if ( "${cframe_build_target_TYPE}" STREQUAL "TEST" )
 ##      get_target_property(
@@ -483,10 +495,17 @@ function( cframe_build_target )
   endif()
 
   if ( DEFINED cframe_build_target_PROJECT_LABEL )
+    if( NOT "${cframe_build_target_TYPE}" STREQUAL "INTERFACE" )
       set_target_properties(
           ${cframe_build_target_TARGET_NAME} PROPERTIES
           PROJECT_LABEL   ${cframe_build_target_PROJECT_LABEL}
       )
+    else()
+      set_target_properties(
+          ${cframe_build_target_TARGET_NAME}_display PROPERTIES
+          PROJECT_LABEL   ${cframe_build_target_PROJECT_LABEL}
+      )
+    endif()
   endif()
 
   if ( CFRAME_FLAT_SOURCE_TREE )
@@ -513,27 +532,38 @@ function( cframe_build_target )
       PROPERTY PUBLIC_HEADER
   )
 
-  set_target_properties(
-      ${cframe_build_target_TARGET_NAME}
-      PROPERTIES
-          DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
-  )
+  if( NOT "${cframe_build_target_TYPE}" STREQUAL "INTERFACE" )
+    set_target_properties(
+        ${cframe_build_target_TARGET_NAME}
+        PROPERTIES
+            DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+    )
+  endif()
 
   # set the target group
   if ( DEFINED cframe_build_target_GROUP )
+    if( NOT "${cframe_build_target_TYPE}" STREQUAL "INTERFACE" )
       set_target_properties(
           ${cframe_build_target_TARGET_NAME} PROPERTIES
           FOLDER ${cframe_build_target_GROUP}
       )
+    else()
+      set_target_properties(
+          ${cframe_build_target_TARGET_NAME}_display PROPERTIES
+          FOLDER ${cframe_build_target_GROUP}
+      )
+    endif()
   endif()
 
   # set PIC on shared libraries
   if ( NOT WIN32 AND NOT BUILD_SHARED_LIBS )
+    if( NOT "${cframe_build_target_TYPE}" STREQUAL "INTERFACE" )
       # Ensure that static libraries use position independent code on Linux
       set_target_properties(
           ${cframe_build_target_TARGET_NAME} PROPERTIES
           POSITION_INDEPENDENT_CODE ON
       )
+    endif()
   endif()
 
   # set target compile flags
