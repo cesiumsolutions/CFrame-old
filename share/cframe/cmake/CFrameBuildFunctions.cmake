@@ -20,7 +20,7 @@ set_property(
 #   TARGET_NAME         - name of the target to build
 #   OUTPUT_NAME         - name of the output, if not specified, uses TARGET_NAME
 #   PROJECT_LABEL       - the name to display in IDEs, defaults to TARGET_NAME
-#   TYPE                - the type of target, either "Library", "Executable", "Test" or "Custom"
+#   TYPE                - the type of target, either "Library", "Executable", "Interface", "Test" or "Custom"
 #   LINK_TYPE           - the linking type for Library targets: STATIC, SHARED, or DEFAULT (the default)
 #   GROUP               - The organization group to place the library in (for IDE build environments)
 #   INCLUDE_DIRS        - a list of directories to include
@@ -173,6 +173,7 @@ function( cframe_build_target )
     cframe_message( WARNING 1 "CFrame: cframe_build_target no TYPE parameter specified" )
     return()
   elseif ( NOT ( (${cframe_build_target_TYPE} STREQUAL "LIBRARY") OR
+                 (${cframe_build_target_TYPE} STREQUAL "INTERFACE") OR
                  (${cframe_build_target_TYPE} STREQUAL "EXECUTABLE") OR
 ##                 (${cframe_build_target_TYPE} STREQUAL "TEST") OR
                  (${cframe_build_target_TYPE} STREQUAL "CUSTOM") ) )
@@ -325,6 +326,8 @@ function( cframe_build_target )
       set( LINK_TYPE SHARED )
     elseif( cframe_build_target_LINK_TYPE STREQUAL "STATIC" )
       set( LINK_TYPE STATIC )
+    elseif( cframe_build_target_LINK_TYPE STREQUAL "INTERFACE" )
+      set( LINK_TYPE INTERFACE )
     endif()
   endif()
   if ( NOT DEFINED LINK_TYPE )
@@ -375,10 +378,10 @@ function( cframe_build_target )
   )
 
   # If no sources (either specified or generated) were found, sppecify target
-  # type as "Custom"
+  # type as "INERFACE"
   if ( ("${${cframe_build_target_TARGET_NAME}_ALL_SOURCES}" STREQUAL "") AND
        ("${cframe_build_target_TYPE}" STREQUAL "LIBRARY") )
-    set( cframe_build_target_TYPE "CUSTOM" )
+    set( cframe_build_target_TYPE "INTERFACE" )
     cframe_message( STATUS 1
         "CFrame: Automatically setting target ${cframe_build_target_TARGET_NAME}
            as Custom type because no sources (neither specified nor generated) were
@@ -432,6 +435,18 @@ function( cframe_build_target )
     add_executable(
         ${cframe_build_target_TARGET_NAME}
         ${${cframe_build_target_TARGET_NAME}_ALL_FILES}
+    )
+
+  elseif( "${cframe_build_target_TYPE}" STREQUAL "INTERFACE" )
+    add_library( ${cframe_build_target_TARGET_NAME} INTERFACE )
+    set_property(
+        TARGET ${cframe_build_target_TARGET_NAME}
+        PROPERTY
+            INTERFACE_SOURCES
+                ${cframe_build_target_HEADERS_PUBLIC}
+                ${cframe_build_target_FILES_PUBLIC}
+                ${cframe_build_target_HEADERS_PRIVATE}
+                ${cframe_build_target_FILES_PRIVATE}
     )
 
 ##    if ( "${cframe_build_target_TYPE}" STREQUAL "TEST" )
