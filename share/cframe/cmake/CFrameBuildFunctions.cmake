@@ -398,14 +398,31 @@ function( cframe_build_target )
         ${cframe_build_target_HEADERS_PUBLIC}
         ${cframe_build_target_HEADERS_PRIVATE}
         ${cframe_build_target_SOURCES}
+        ${cframe_build_target_FILES_PUBLIC}
+        ${cframe_build_target_FILES_PRIVATE}
     )
   elseif ( "${CFRAME_SOURCE_DISPLAY_MODE}" STREQUAL "TREE" )
+    # Generated files that are output outside the source tree  (e.g. in the
+    # ${CMAKE_CURRENT_BINARY_DIR} ) will cause an error, so exclude them
+    foreach( file
+        ${cframe_build_target_HEADERS_PUBLIC}
+        ${cframe_build_target_HEADERS_PRIVATE}
+        ${cframe_build_target_SOURCES}
+        ${cframe_build_target_FILES_PUBLIC}
+        ${cframe_build_target_FILES_PRIVATE}
+    )
+      get_filename_component( abs_path ${file} REALPATH )
+      file( RELATIVE_PATH rel_path ${PROJECT_SOURCE_DIR} ${abs_path} )
+      string( FIND ${rel_path} ".." result )
+      if ( ${result} EQUAL -1 )
+        list( APPEND display_files ${file} )
+      endif()
+    endforeach()
+
     source_group(
         TREE ${CMAKE_CURRENT_SOURCE_DIR}
         FILES
-            ${cframe_build_target_HEADERS_PUBLIC}
-            ${cframe_build_target_HEADERS_PRIVATE}
-            ${cframe_build_target_SOURCES}
+            ${display_files}
     )
   endif()
 
