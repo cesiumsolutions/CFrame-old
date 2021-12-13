@@ -13,6 +13,8 @@ set_property(
     PROPERTY STRINGS TREE FLAT DEFAULT
 )
 
+option( BUILD_SHARED_LIBS "Toggle whether to build Shared Libraries" ON )
+
 # -----------------------------------------------------------------------------
 # Function to encapsulate the most common standard steps for building a target.
 #
