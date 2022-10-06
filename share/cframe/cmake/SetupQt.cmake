@@ -93,16 +93,6 @@ if ( QT_VERSION_4 )
 
 elseif ( QT_VERSION_5 )
 
-  # Requires CMake version 2.8.11 or above
-  cmake_policy( SET CMP0011 OLD )
-  cmake_policy( SET CMP0020 NEW )
-  # disable autolinking to qtmain as we have our own main() functions (new in Qt 5.1)
-  if ( (${CMAKE_MAJOR_VERSION} EQUAL 2 OR ${CMAKE_MAJOR_VERSION} GREATER 2) AND
-       (${CMAKE_MINOR_VERSION} EQUAL 8 OR ${CMAKE_MINOR_VERSION} GREATER 8) AND
-        ${CMAKE_PATCH_VERSION} GREATER 10 )
-    cmake_policy(SET CMP0020 OLD)
-  endif()
-
   if ( WIN32 )
     add_definitions( -DWIN32 -D_WINDOWS ) ## Qt5 is screwing this up somehow
   endif()
@@ -111,6 +101,7 @@ elseif ( QT_VERSION_5 )
   set( QT5_COMPONENTS
       ${CFRAME_EXTERNAL_Qt_COMPONENTS}
   )
+
   qt5_setup_components( QT5_COMPONENTS )
 
   include_directories( ${QT_INCLUDES} )
