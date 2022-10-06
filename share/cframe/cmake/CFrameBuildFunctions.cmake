@@ -237,11 +237,6 @@ function( cframe_build_target )
         ${cframe_build_target_QT_MOCFILES}
     )
 
-    if ( CFRAME_FLAT_SOURCE_TREE )
-      source_group(
-          \\ FILES ${cframe_build_target_QT_MOCFILES}
-      )
-    endif()
     source_group(
         \\generated\\moc_files FILES
         ${${cframe_build_target_TARGET_NAME}_MOCSOURCES}
@@ -527,21 +522,12 @@ function( cframe_build_target )
     endif()
   endif()
 
-  if ( CFRAME_FLAT_SOURCE_TREE )
-      source_group(
-          \\ FILES
-          ${cframe_build_target_HEADERS_PUBLIC}
-          ${cframe_build_target_HEADERS_PRIVATE}
-          ${cframe_build_target_SOURCES}
-      )
-  endif()
-
   if( DEFINED cframe_build_target_LIBRARIES )
     if ( "${cframe_build_target_TYPE}" STREQUAL "INTERFACE")
       target_link_libraries(
           ${cframe_build_target_TARGET_NAME} INTERFACE
           ${cframe_build_target_LIBRARIES}
-      )
+      )    
     else()
       target_link_libraries(
           ${cframe_build_target_TARGET_NAME}
