@@ -537,10 +537,17 @@ function( cframe_build_target )
   endif()
 
   if( DEFINED cframe_build_target_LIBRARIES )
+    if ( "${cframe_build_target_TYPE}" STREQUAL "INTERFACE")
+      target_link_libraries(
+          ${cframe_build_target_TARGET_NAME} INTERFACE
+          ${cframe_build_target_LIBRARIES}
+      )
+    else()
       target_link_libraries(
           ${cframe_build_target_TARGET_NAME}
           ${cframe_build_target_LIBRARIES}
       )
+    endif()
   endif()
 
   # -----------------------------------
